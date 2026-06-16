@@ -1,0 +1,74 @@
+{
+  "currency": "VND",
+  "source": "estimate",
+  "routes": {
+    "SGN-DAD": {
+      "label": "Ho Chi Minh City → Da Nang",
+      "duration_hours": 1.3,
+      "low": 900000,
+      "mid": 1500000,
+      "high": 2800000
+    },
+    "SGN-HAN": {
+      "label": "Ho Chi Minh City → Hanoi",
+      "duration_hours": 2.1,
+      "low": 1100000,
+      "mid": 1800000,
+      "high": 3200000
+    },
+    "HAN-DAD": {
+      "label": "Hanoi → Da Nang",
+      "duration_hours": 1.2,
+      "low": 800000,
+      "mid": 1400000,
+      "high": 2600000
+    },
+    "HAN-PQC": {
+      "label": "Hanoi → Phu Quoc",
+      "duration_hours": 2.3,
+      "low": 1200000,
+      "mid": 2000000,
+      "high": 3500000
+    },
+    "SGN-PQC": {
+      "label": "Ho Chi Minh City → Phu Quoc",
+      "duration_hours": 1.0,
+      "low": 700000,
+      "mid": 1200000,
+      "high": 2200000
+    },
+    "SGN-NHA": {
+      "label": "Ho Chi Minh City → Nha Trang",
+      "duration_hours": 1.0,
+      "low": 600000,
+      "mid": 1100000,
+      "high": 2000000
+    },
+    "HAN-HUI": {
+      "label": "Hanoi → Hue",
+      "duration_hours": 1.1,
+      "low": 700000,
+      "mid": 1300000,
+      "high": 2400000
+    }
+  },
+  "city_codes": {
+    "ho chi minh city": "SGN",
+    "hcmc": "SGN",
+    "saigon": "SGN",
+    "hanoi": "HAN",
+    "da nang": "DAD",
+    "danang": "DAD",
+    "phu quoc": "PQC",
+    "nha trang": "NHA",
+    "hue": "HUI",
+    "hoi an": "DAD",
+    "can tho": "SGN",
+    "vung tau": "SGN"
+  },
+  "train_estimates": {
+    "SGN-DAD": { "low": 400000, "mid": 700000, "high": 1200000, "duration_hours": 17 },
+    "HAN-DAD": { "low": 350000, "mid": 650000, "high": 1100000, "duration_hours": 16 },
+    "HAN-SGN": { "low": 500000, "mid": 900000, "high": 1500000, "duration_hours": 32 }
+  }
+}

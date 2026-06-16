@@ -1,0 +1,24 @@
+{
+  "currency": "VND",
+  "stay_nightly_per_room": {
+    "hostel": { "low": 150000, "mid": 250000, "high": 400000 },
+    "guest_house": { "low": 300000, "mid": 500000, "high": 800000 },
+    "hotel_2star": { "low": 400000, "mid": 700000, "high": 1100000 },
+    "hotel_3star": { "low": 600000, "mid": 1000000, "high": 1600000 },
+    "hotel_4star": { "low": 900000, "mid": 1500000, "high": 2500000 },
+    "hotel_5star": { "low": 1500000, "mid": 2800000, "high": 5000000 },
+    "default": { "low": 500000, "mid": 900000, "high": 1500000 }
+  },
+  "food_per_person_per_day": {
+    "low": 150000,
+    "mid": 300000,
+    "high": 500000
+  },
+  "activities_per_person_per_day": {
+    "low": 100000,
+    "mid": 200000,
+    "high": 400000
+  },
+  "fuel_vnd_per_km": 3500,
+  "people_per_car": 4
+}

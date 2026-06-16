@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+.greennode.json
+.agentbase/
+*.credentials.json
+.git/
+.gitignore
+*.md

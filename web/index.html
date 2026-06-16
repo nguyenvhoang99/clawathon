@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chuyến đi nhóm — Zalopay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --white: #ffffff;
+      --main-green: #00cf6a;
+      --main-blue: #0033c9;
+      --sub-cyan: #00b4ff;
+      --sub-lime: #a1ff00;
+      --sub-purple: #6f0cdf;
+      --sub-pink: #fd7290;
+      --sub-orange: #f8a000;
+      --bg: #f0f4fc;
+      --surface: var(--white);
+      --border: #dce4f5;
+      --text: #0a1628;
+      --muted: #5c6b8a;
+      --shadow: 0 2px 12px rgba(0, 51, 201, 0.06);
+      --radius: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Be Vietnam Pro", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    .page { max-width: 1400px; margin: 0 auto; padding: 24px 20px 36px; }
+
+    .site-header { margin-bottom: 20px; }
+    .site-header h1 {
+      margin: 0 0 4px;
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--main-blue);
+    }
+    .site-header h1 span.brand { color: var(--main-green); }
+    .site-header p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(260px, 300px) 1fr minmax(290px, 370px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .col h2 {
+      margin: 0 0 2px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--main-blue);
+    }
+
+    .section-hint { margin: 0 0 14px; color: var(--muted); font-size: 0.78rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px 16px; border: none; border-radius: 10px;
+      font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: transform 0.12s, filter 0.12s;
+    }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-green { background: var(--main-green); color: var(--white); }
+    .btn-blue { background: var(--main-blue); color: var(--white); }
+    .btn-outline { background: var(--white); border: 1.5px solid var(--main-blue); color: var(--main-blue); }
+    .btn-sm { padding: 7px 12px; font-size: 0.78rem; }
+    .btn-block { width: 100%; }
+
+    .mode-badge {
+      display: inline-block; margin-left: 6px; padding: 2px 8px;
+      font-size: 0.65rem; font-weight: 600; border-radius: 999px;
+      background: rgba(0, 207, 106, 0.15); color: #00884a;
+    }
+
+    /* Weather */
+    .weather-chat { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .weather-chat input {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: 10px; font: inherit; font-size: 0.85rem; background: var(--bg);
+    }
+    .weather-chat input:focus { outline: 2px solid rgba(0, 207, 106, 0.35); border-color: var(--main-green); }
+    .weather-reply {
+      padding: 12px; background: linear-gradient(135deg, rgba(0, 180, 255, 0.08), rgba(0, 207, 106, 0.08));
+      border-radius: 10px; font-size: 0.84rem; min-height: 44px; border-left: 3px solid var(--sub-cyan);
+      margin-bottom: 4px;
+    }
+    .weather-reply.empty { color: var(--muted); font-style: italic; border-left-color: var(--border); }
+
+    .weather-block-divider {
+      margin: 24px 0 14px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .city-section-label {
+      margin: 0 0 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--main-blue);
+    }
+
+    .city-section-label span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .city-tabs { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+    .city-tab {
+      padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;
+      background: var(--bg); font: inherit; font-size: 0.8rem; cursor: pointer; text-align: left;
+    }
+    .city-tab.active { background: var(--main-blue); color: var(--white); border-color: var(--main-blue); }
+
+    .forecast-slider { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+    .day-card {
+      flex: 0 0 76px; padding: 8px 4px; border: 1px solid var(--border); border-radius: 10px;
+      background: var(--bg); text-align: center; cursor: pointer;
+    }
+    .day-card.selected { border-color: var(--main-green); box-shadow: 0 0 0 2px rgba(0, 207, 106, 0.25); }
+    .day-card .weekday { font-size: 0.62rem; font-weight: 600; color: var(--muted); }
+    .day-card .icon { font-size: 1.3rem; margin: 2px 0; }
+    .day-card .temps { font-size: 0.72rem; font-weight: 600; }
+
+    .forecast-detail {
+      margin-top: 10px; padding: 10px; background: rgba(0, 51, 201, 0.06);
+      border-radius: 10px; font-size: 0.8rem; display: none;
+    }
+    .forecast-detail.visible { display: block; }
+
+    /* Trip */
+    .trip-form textarea {
+      width: 100%; min-height: 84px; padding: 12px; border: 1px solid var(--border);
+      border-radius: 10px; font: inherit; font-size: 0.88rem; resize: vertical;
+      background: var(--bg); margin-bottom: 10px;
+    }
+    .trip-form textarea:focus { outline: 2px solid rgba(0, 51, 201, 0.2); border-color: var(--main-blue); }
+
+    .trip-results { margin-top: 18px; display: none; }
+    .trip-results.visible { display: block; }
+
+    .card-block {
+      border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px;
+      overflow: hidden; background: var(--white);
+    }
+    .card-block-header {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 14px 16px; border: none; background: var(--bg);
+      font: inherit; text-align: left; cursor: pointer;
+    }
+    .card-block-header:hover { background: #e8eef9; }
+    .card-title { font-weight: 700; font-size: 0.9rem; color: var(--main-blue); }
+    .card-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .chevron { width: 18px; height: 18px; transition: transform 0.2s; color: var(--muted); flex-shrink: 0; }
+    .card-block.open .chevron { transform: rotate(180deg); }
+    .card-block-body { display: none; padding: 14px 16px 16px; font-size: 0.85rem; }
+    .card-block.open .card-block-body { display: block; }
+
+    .rich-text p { margin: 0 0 8px; }
+    .rich-text ul { margin: 0; padding-left: 1.1rem; }
+    .rich-text li { margin-bottom: 4px; }
+    .rich-text strong { color: var(--main-blue); }
+
+    .prep-banner {
+      background: linear-gradient(135deg, rgba(0, 51, 201, 0.08), rgba(0, 207, 106, 0.1));
+      border: 1px solid rgba(0, 51, 201, 0.15); border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 12px;
+    }
+    .prep-banner h3 { margin: 0 0 4px; font-size: 0.88rem; color: var(--main-blue); }
+    .prep-banner p { margin: 0; font-size: 0.78rem; color: var(--muted); }
+
+    .service-grid { display: grid; gap: 10px; margin-top: 10px; }
+    .service-card {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+      padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--white);
+    }
+    .service-card.transport { border-left: 3px solid var(--sub-cyan); }
+    .service-card.stay { border-left: 3px solid var(--sub-purple); }
+    .service-type { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+    .service-type.transport { color: var(--sub-cyan); }
+    .service-type.stay { color: var(--sub-purple); }
+    .service-name { font-weight: 600; font-size: 0.88rem; margin: 2px 0; }
+    .service-note { font-size: 0.75rem; color: var(--muted); }
+    .service-price { font-weight: 700; color: var(--main-green); font-size: 0.88rem; white-space: nowrap; }
+    .service-action {
+      margin-top: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 600;
+      background: var(--main-blue); color: var(--white); border: none; cursor: pointer;
+    }
+
+    .day-plan {
+      padding: 12px 0; border-bottom: 1px dashed var(--border);
+    }
+    .day-plan:last-child { border-bottom: none; }
+    .day-plan-head { font-weight: 700; color: var(--main-blue); margin-bottom: 6px; }
+    .day-plan ul { margin: 0; padding-left: 1.1rem; color: var(--text); }
+
+    .budget-row {
+      display: flex; justify-content: space-between; padding: 8px 0;
+      border-bottom: 1px solid var(--border); font-size: 0.84rem;
+    }
+    .budget-row.total { font-weight: 700; color: var(--main-blue); border-bottom: none; }
+
+    /* Bill panel */
+    .col-bill { padding: 0; overflow: hidden; }
+    .bill-panel-header {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 16px 18px; border: none; cursor: pointer; text-align: left; font: inherit;
+      background: linear-gradient(135deg, rgba(0, 51, 201, 0.06), rgba(0, 207, 106, 0.08));
+    }
+    .bill-panel-title { font-weight: 700; font-size: 0.95rem; color: var(--main-blue); }
+    .bill-panel-sub { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+    .bill-chevron { width: 20px; height: 20px; color: var(--main-blue); transition: transform 0.2s; }
+    .col-bill.expanded .bill-chevron { transform: rotate(180deg); }
+    .bill-panel-body { display: none; padding: 0 18px 18px; max-height: 75vh; overflow-y: auto; }
+    .col-bill.expanded .bill-panel-body { display: block; }
+
+    .bill-section {
+      margin-bottom: 16px; padding: 14px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--bg);
+    }
+    .bill-section-title {
+      font-size: 0.82rem; font-weight: 700; color: var(--main-blue);
+      margin: 0 0 10px; display: flex; align-items: center; gap: 6px;
+    }
+    .bill-section-num {
+      width: 20px; height: 20px; border-radius: 50%; background: var(--main-green);
+      color: var(--white); font-size: 0.7rem; display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    .member-form { display: flex; flex-direction: column; gap: 8px; }
+    .member-form input {
+      padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 0.84rem;
+    }
+    .form-error { color: var(--sub-pink); font-size: 0.76rem; margin-top: 4px; display: none; }
+    .form-error.visible { display: block; }
+    .member-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .member-tag {
+      padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 500;
+      background: rgba(0, 51, 201, 0.1); color: var(--main-blue);
+    }
+
+    .filter-input {
+      width: 100%; padding: 9px 11px; border: 1px solid var(--border);
+      border-radius: 8px; font: inherit; font-size: 0.84rem; margin-bottom: 10px;
+    }
+
+    .payable-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.84rem;
+    }
+    .payable-row.hidden { display: none; }
+    .payable-name { font-weight: 600; }
+    .payable-phone { font-size: 0.72rem; color: var(--muted); }
+    .amount-owe { color: var(--sub-pink); font-weight: 700; }
+    .amount-receive { color: var(--main-green); font-weight: 700; }
+
+    .confirm-status {
+      padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 10px;
+      background: rgba(248, 160, 0, 0.12); color: #9a6200; border: 1px solid rgba(248, 160, 0, 0.3);
+    }
+    .confirm-status.done {
+      background: rgba(0, 207, 106, 0.12); color: #007a40; border-color: rgba(0, 207, 106, 0.3);
+    }
+
+    .qr-block {
+      margin-top: 12px; padding: 14px; background: var(--white);
+      border-radius: 10px; text-align: center; border: 1px solid var(--border);
+    }
+    .qr-block img { width: 120px; height: 120px; object-fit: contain; border-radius: 8px; }
+    .qr-placeholder {
+      width: 120px; height: 120px; margin: 0 auto 8px; border-radius: 8px;
+      background: linear-gradient(135deg, #e8eef9, #f0f4fc);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: var(--muted);
+    }
+
+    /* Receipt upload & slider */
+    .receipt-upload-form { display: flex; flex-direction: column; gap: 8px; }
+    .receipt-upload-form input, .receipt-upload-form select {
+      padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px;
+      font: inherit; font-size: 0.84rem; background: var(--white);
+    }
+    .upload-zone {
+      border: 1.5px dashed var(--sub-cyan); border-radius: 10px; padding: 14px;
+      text-align: center; cursor: pointer; background: rgba(0, 180, 255, 0.05);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .upload-zone:hover { border-color: var(--main-blue); background: rgba(0, 51, 201, 0.06); }
+    .upload-zone.has-file { border-color: var(--main-green); background: rgba(0, 207, 106, 0.08); }
+    .upload-zone input { display: none; }
+    .upload-zone-text { font-size: 0.78rem; color: var(--muted); }
+    .upload-zone-text strong { color: var(--main-blue); display: block; margin-bottom: 2px; }
+
+    .receipt-slider-wrap { margin-top: 12px; }
+    .receipt-slider-label {
+      font-size: 0.75rem; font-weight: 600; color: var(--muted); margin-bottom: 8px;
+    }
+    .receipt-slider {
+      display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px;
+      scroll-snap-type: x mandatory;
+    }
+    .receipt-slider::-webkit-scrollbar { height: 5px; }
+    .receipt-slider::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .receipt-card {
+      flex: 0 0 120px; scroll-snap-align: start;
+      border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+      background: var(--white); cursor: pointer; position: relative;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .receipt-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 51, 201, 0.12);
+    }
+    .receipt-thumb {
+      height: 72px; background: var(--bg); display: flex; align-items: center;
+      justify-content: center; overflow: hidden;
+    }
+    .receipt-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .receipt-thumb-placeholder { font-size: 1.6rem; }
+    .receipt-card-body { padding: 8px 10px; }
+    .receipt-card-merchant {
+      font-size: 0.75rem; font-weight: 600; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .receipt-card-amount { font-size: 0.78rem; color: var(--main-green); font-weight: 700; margin-top: 2px; }
+    .receipt-card-payer { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+
+    .receipt-hover-tip {
+      display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
+      transform: translateX(-50%); z-index: 10;
+      background: var(--text); color: var(--white); font-size: 0.68rem;
+      padding: 6px 10px; border-radius: 6px; white-space: nowrap; pointer-events: none;
+    }
+    .receipt-card:hover .receipt-hover-tip { display: block; }
+
+    .receipt-modal-overlay {
+      position: fixed; inset: 0; background: rgba(10, 22, 40, 0.45);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+      padding: 20px;
+    }
+    .receipt-modal-overlay.open { display: flex; }
+    .receipt-modal {
+      background: var(--white); border-radius: 14px; max-width: 360px; width: 100%;
+      max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    }
+    .receipt-modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+    }
+    .receipt-modal-header h3 { margin: 0; font-size: 0.95rem; color: var(--main-blue); }
+    .receipt-modal-close {
+      width: 32px; height: 32px; border: none; border-radius: 8px;
+      background: var(--bg); font-size: 1.2rem; cursor: pointer; line-height: 1;
+    }
+    .receipt-modal-image {
+      width: 100%; max-height: 220px; object-fit: contain; background: var(--bg);
+    }
+    .receipt-modal-body { padding: 14px 16px 18px; font-size: 0.85rem; }
+    .receipt-detail-row {
+      display: flex; justify-content: space-between; padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .receipt-detail-row:last-child { border-bottom: none; }
+    .receipt-detail-row span:first-child { color: var(--muted); }
+
+    @media (max-width: 960px) {
+      .workspace { grid-template-columns: 1fr; }
+      .city-tabs { flex-direction: row; flex-wrap: wrap; }
+      .city-tab { flex: 1; text-align: center; min-width: 90px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <h1><span class="brand">Zalopay</span> · Chuyến đi nhóm <span class="mode-badge" id="modeBadge">demo</span></h1>
+      <p>Thời tiết, lên kế hoạch và chia hóa đơn cho team — tích hợp dịch vụ Zalopay.</p>
+    </header>
+
+    <div class="workspace">
+      <aside class="col col-weather">
+        <h2>Thời tiết</h2>
+        <p class="section-hint">Hỏi chatbot hoặc xem dự báo 7 ngày.</p>
+        <form class="weather-chat" id="weatherChatForm">
+          <input type="text" id="weatherInput" placeholder="VD: Tuần này Đà Nẵng mưa không?" autocomplete="off" />
+          <button type="submit" class="btn btn-green btn-sm" id="weatherSendBtn">Hỏi</button>
+        </form>
+        <div class="weather-reply empty" id="weatherReply" role="status">Thử: "Hôm nay Hà Nội thế nào?"</div>
+
+        <div class="weather-block-divider">
+          <p class="city-section-label">
+            Top 3 thành phố du lịch Việt Nam
+            <span>Dự báo 7 ngày tới · Hà Nội · TP.HCM · Đà Nẵng</span>
+          </p>
+          <div class="city-tabs" role="tablist">
+            <button type="button" class="city-tab active" data-city="Hanoi">Hà Nội</button>
+            <button type="button" class="city-tab" data-city="Ho Chi Minh City">TP.HCM</button>
+            <button type="button" class="city-tab" data-city="Da Nang">Đà Nẵng</button>
+          </div>
+          <div id="forecastContainer"><div class="section-hint">Đang tải…</div></div>
+          <div class="forecast-detail" id="forecastDetail"></div>
+        </div>
+      </aside>
+
+      <main class="col col-trip">
+        <h2>Lên kế hoạch chuyến đi</h2>
+        <p class="section-hint">Mô tả điểm đến, ngày đi, số người và ngân sách. Đặt vé &amp; phòng qua đối tác Zalopay.</p>
+        <form class="trip-form" id="tripForm">
+          <textarea id="tripInput" placeholder="VD: 10 người từ TP.HCM đi Đà Nẵng 20–23/3, 5 triệu/người. Thích biển và ẩm thực."></textarea>
+          <button type="submit" class="btn btn-blue" id="tripSubmitBtn">Lên lịch trình</button>
+        </form>
+        <div class="trip-results" id="tripResults"></div>
+      </main>
+
+      <aside class="col col-bill" id="billPanel">
+        <button type="button" class="bill-panel-header" id="billPanelToggle" aria-expanded="false">
+          <div>
+            <div class="bill-panel-title">Chia hóa đơn</div>
+            <div class="bill-panel-sub" id="billSummary">Chạm để mở · Ví Zalopay</div>
+          </div>
+          <svg class="bill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="bill-panel-body" id="billPanelBody"></div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="receipt-modal-overlay" id="receiptModalOverlay" aria-hidden="true">
+    <div class="receipt-modal" role="dialog" aria-labelledby="receiptModalTitle">
+      <div class="receipt-modal-header">
+        <h3 id="receiptModalTitle">Chi tiết hóa đơn</h3>
+        <button type="button" class="receipt-modal-close" id="receiptModalClose" aria-label="Đóng">&times;</button>
+      </div>
+      <div id="receiptModalContent"></div>
+    </div>
+  </div>
+
+  <script src="config.js" onerror="void 0"></script>
+  <script>
+    const WEATHER_VI = {
+      0: "Trời quang", 1: "Ít mây", 2: "Có mây", 3: "U ám",
+      45: "Sương mù", 48: "Sương muối", 51: "Mưa phùn nhẹ", 53: "Mưa phùn", 55: "Mưa phùn dày",
+      61: "Mưa nhẹ", 63: "Mưa vừa", 65: "Mưa to",
+      80: "Mưa rào nhẹ", 81: "Mưa rào", 82: "Mưa rào mạnh",
+      95: "Dông", 96: "Dông kèm mưa đá", 99: "Dông mạnh",
+    };
+    const WEATHER_EMOJI = {
+      0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️", 45: "🌫️", 48: "🌫️",
+      51: "🌦️", 53: "🌦️", 55: "🌧️", 61: "🌧️", 63: "🌧️", 65: "🌧️",
+      80: "🌦️", 81: "🌧️", 82: "⛈️", 95: "⛈️", 96: "⛈️", 99: "⛈️",
+    };
+
+    const CITY_LABELS = { Hanoi: "Hà Nội", "Ho Chi Minh City": "TP.HCM", "Da Nang": "Đà Nẵng" };
+    const CATEGORIES_VI = { stay: "Lưu trú", transport: "Di chuyển", activity: "Hoạt động", activities: "Ăn uống & vui chơi", food: "Ăn uống", other: "Khác" };
+
+    const forecastCache = {};
+    let selectedDayIndex = null;
+    let billExpanded = false;
+    let billData = null;
+    let billSettled = false;
+    let billsConfirmed = false;
+    let teamMembers = [];
+    let payableFilter = "";
+    let recordedBills = [];
+    let pendingUploadFile = null;
+
+    const config = window.AGENT_CONFIG || {};
+    const zalopay = config.zalopay || {};
+    const useLiveAgents = Boolean(config.useLiveAgents && config.proxyBase);
+
+    function teamHeaders() {
+      const teamId = localStorage.getItem("teamId") || config.teamId || "team-web-demo";
+      const sessionId = localStorage.getItem("sessionId") || config.sessionId || "session-1";
+      localStorage.setItem("teamId", teamId);
+      localStorage.setItem("sessionId", sessionId);
+      return {
+        "Content-Type": "application/json",
+        "X-GreenNode-AgentBase-Custom-Team-Id": teamId,
+        "X-GreenNode-AgentBase-Session-Id": sessionId,
+      };
+    }
+
+    async function apiPost(path, body, userId) {
+      const headers = { ...teamHeaders() };
+      if (userId) headers["X-GreenNode-AgentBase-User-Id"] = userId;
+      const res = await fetch(`${config.proxyBase}${path}`, {
+        method: "POST", headers, body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`Lỗi API ${res.status}`);
+      return res.json();
+    }
+
+    function formatVnd(n) {
+      if (n == null || Number.isNaN(n)) return "—";
+      return new Intl.NumberFormat("vi-VN").format(n) + " ₫";
+    }
+
+    function stripDiacritics(text) {
+      return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9 ]+/g, "").toUpperCase().trim();
+    }
+
+    function normalizePhone(phone) {
+      let p = phone.replace(/\D/g, "");
+      if (p.startsWith("84") && p.length === 11) p = "0" + p.slice(2);
+      return p;
+    }
+
+    function normalizeName(name) {
+      return name.trim().toLowerCase();
+    }
+
+    function isDuplicateName(name) {
+      const key = normalizeName(name);
+      return teamMembers.some((m) => normalizeName(m.display_name) === key);
+    }
+
+    /** Chuyển nội dung agent (markdown) thành HTML gọn, không hiển thị raw markdown */
+    function beautifyAgentText(text) {
+      if (!text || typeof text !== "string") return "<p>Đang cập nhật…</p>";
+      const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+      const parts = [];
+      let listItems = [];
+
+      const flushList = () => {
+        if (listItems.length) {
+          parts.push(`<ul>${listItems.map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>`);
+          listItems = [];
+        }
+      };
+
+      for (const line of lines) {
+        if (/^#{1,3}\s+/.test(line)) {
+          flushList();
+          const title = line.replace(/^#{1,3}\s+/, "").replace(/\*\*/g, "");
+          parts.push(`<p><strong>${escapeHtml(title)}</strong></p>`);
+        } else if (/^[-*•]\s+/.test(line) || /^\d+\.\s+/.test(line)) {
+          listItems.push(line.replace(/^[-*•]\s+/, "").replace(/^\d+\.\s+/, "").replace(/\*\*/g, ""));
+        } else {
+          flushList();
+          const clean = line.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*/g, "");
+          parts.push(`<p>${clean}</p>`);
+        }
+      }
+      flushList();
+      return `<div class="rich-text">${parts.join("")}</div>`;
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function buildPreTripServices(brief) {
+      const origin = brief.origin_city || "TP.HCM";
+      const dest = brief.destination_city || "Đà Nẵng";
+      return {
+        transport: [
+          { type: "Máy bay", provider: "Vietjet Air", price: 1890000, note: `${origin} → ${dest} · qua Zalopay`, color: "transport" },
+          { type: "Xe khách", provider: "Phương Trang FUTA", price: 450000, note: "Ghế ngồi · đặt trên Zalopay", color: "transport" },
+          { type: "Tàu hỏa", provider: "Đường sắt Việt Nam", price: 680000, note: "Toa cứng điều hòa", color: "transport" },
+        ],
+        stay: [
+          { type: "Khách sạn", provider: "Mường Thanh Đà Nẵng", price: 850000, note: "Phòng đôi/đêm · Zalopay", color: "stay" },
+          { type: "Nhà nghỉ", provider: "Homestay Hội An", price: 420000, note: "Gần phố cổ", color: "stay" },
+          { type: "Khách sạn", provider: "Novotel Premier", price: 1250000, note: "Bãi biển Mỹ Khê", color: "stay" },
+        ],
+      };
+    }
+
+    function renderServiceCards(services) {
+      const renderGroup = (items, title) => items.length ? `
+        <p style="margin:12px 0 6px;font-weight:700;font-size:0.82rem;color:var(--main-blue)">${title}</p>
+        <div class="service-grid">${items.map((s) => `
+          <div class="service-card ${s.color}">
+            <div>
+              <div class="service-type ${s.color}">${s.type}</div>
+              <div class="service-name">${s.provider}</div>
+              <div class="service-note">${s.note}</div>
+              <button type="button" class="service-action" onclick="alert('Sắp tích hợp API Zalopay')">Đặt qua Zalopay</button>
+            </div>
+            <div class="service-price">${formatVnd(s.price)}<div style="font-size:0.68rem;font-weight:400;color:var(--muted)">/người</div></div>
+          </div>`).join("")}</div>` : "";
+
+      return renderGroup(services.transport, "✈️ Di chuyển — đặt trước ngày 1")
+        + renderGroup(services.stay, "🏨 Lưu trú — đặt trước ngày 1");
+    }
+
+    function computeBillSummary(balances) {
+      const entries = Object.values(balances || {});
+      const debtors = entries.filter((b) => (b.net_vnd ?? b.net ?? 0) < 0);
+      const totalOwe = debtors.reduce((s, b) => s + Math.abs(b.net_vnd ?? b.net ?? 0), 0);
+      if (!entries.length) return "Chưa có thành viên · chạm để mở";
+      if (debtors.length === 0) return `${entries.length} thành viên · đã cân đối`;
+      return `${debtors.length} người cần trả · ${formatVnd(totalOwe)}`;
+    }
+
+    function updateBillSummary() {
+      const el = document.getElementById("billSummary");
+      if (el && billData) el.textContent = computeBillSummary(billData.balances);
+    }
+
+    function weatherLabel(code) { return WEATHER_VI[code] || "Không xác định"; }
+    function weatherEmoji(code) { return WEATHER_EMOJI[code] || "🌡️"; }
+
+    function formatWeekday(dateStr) {
+      return new Date(dateStr + "T12:00:00").toLocaleDateString("vi-VN", { weekday: "short" });
+    }
+
+    function formatFullDate(dateStr) {
+      return new Date(dateStr + "T12:00:00").toLocaleDateString("vi-VN", { weekday: "long", day: "numeric", month: "long" });
+    }
+
+    async function geocodeCity(name) {
+      const url = new URL("https://geocoding-api.open-meteo.com/v1/search");
+      url.searchParams.set("name", name);
+      url.searchParams.set("count", "1");
+      url.searchParams.set("language", "vi");
+      const res = await fetch(url);
+      const loc = ((await res.json()).results || [])[0];
+      if (!loc) throw new Error("Không tìm thấy thành phố");
+      return { lat: loc.latitude, lon: loc.longitude, label: CITY_LABELS[name] || loc.name };
+    }
+
+    async function fetchForecast(city) {
+      if (forecastCache[city]) return forecastCache[city];
+      const geo = await geocodeCity(city);
+      const url = new URL("https://api.open-meteo.com/v1/forecast");
+      url.searchParams.set("latitude", geo.lat);
+      url.searchParams.set("longitude", geo.lon);
+      url.searchParams.set("daily", "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum");
+      url.searchParams.set("timezone", "auto");
+      url.searchParams.set("forecast_days", "7");
+      const res = await fetch(url);
+      const daily = (await res.json()).daily;
+      const days = daily.time.map((date, i) => ({
+        date, code: daily.weather_code[i],
+        high: Math.round(daily.temperature_2m_max[i]),
+        low: Math.round(daily.temperature_2m_min[i]),
+        precip: daily.precipitation_sum[i],
+      }));
+      forecastCache[city] = { place: geo.label, days };
+      return forecastCache[city];
+    }
+
+    function renderForecast(city) {
+      const container = document.getElementById("forecastContainer");
+      const detail = document.getElementById("forecastDetail");
+      const cached = forecastCache[city];
+      if (!cached) { container.innerHTML = "<div class='section-hint'>Đang tải…</div>"; return; }
+
+      container.innerHTML = `<div class="forecast-slider">${cached.days.map((day, i) => `
+        <div class="day-card${selectedDayIndex === i ? " selected" : ""}" tabindex="0" data-index="${i}">
+          <div class="weekday">${formatWeekday(day.date)}</div>
+          <div class="icon">${weatherEmoji(day.code)}</div>
+          <div class="temps">${day.high}°/${day.low}°</div>
+        </div>`).join("")}</div>`;
+
+      container.querySelectorAll(".day-card").forEach((card) => {
+        const idx = Number(card.dataset.index);
+        const show = () => {
+          selectedDayIndex = idx;
+          renderForecast(city);
+          const day = cached.days[idx];
+          detail.innerHTML = `<strong>${cached.place}</strong> — ${formatFullDate(day.date)}<br>${weatherEmoji(day.code)} ${weatherLabel(day.code)} · Cao ${day.high}° / Thấp ${day.low}°C · Mưa ${day.precip} mm`;
+          detail.classList.add("visible");
+        };
+        card.addEventListener("click", show);
+        card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(); } });
+      });
+    }
+
+    async function loadCityForecast(city) {
+      selectedDayIndex = null;
+      document.getElementById("forecastDetail").classList.remove("visible");
+      try { await fetchForecast(city); renderForecast(city); }
+      catch { document.getElementById("forecastContainer").innerHTML = "<div style='color:var(--sub-pink)'>Không tải được dự báo</div>"; }
+    }
+
+    document.querySelectorAll(".city-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".city-tab").forEach((t) => t.classList.toggle("active", t === tab));
+        loadCityForecast(tab.dataset.city);
+      });
+    });
+
+    document.getElementById("weatherChatForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("weatherInput").value.trim();
+      if (!msg) return;
+      const reply = document.getElementById("weatherReply");
+      const btn = document.getElementById("weatherSendBtn");
+      btn.disabled = true;
+      reply.classList.remove("empty");
+      reply.textContent = "Đang tra cứu…";
+      try {
+        if (useLiveAgents) {
+          const data = await apiPost("/api/weather", { message: msg });
+          reply.textContent = data.response || "Không có phản hồi.";
+        } else {
+          await new Promise((r) => setTimeout(r, 400));
+          reply.textContent = "Xem thanh trượt bên dưới để biết dự báo 7 ngày (dữ liệu Open-Meteo). Bật chế độ live để hỏi chatbot.";
+        }
+      } catch (err) {
+        reply.textContent = "Lỗi: " + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    const MOCK_TRIP = {
+      phase: "done",
+      response: "Chuyến đi Đà Nẵng cho 10 người, 20–23/3.\n\n**Gợi ý:** Đặt vé máy bay và khách sạn qua Zalopay trước ngày khởi hành.\n- Ngày 1: Nhận phòng, tắm biển Mỹ Khê\n- Ngày 2: Ngũ Hành Sơn, phố cổ Hội An",
+      trip_brief: { destination_city: "Đà Nẵng", origin_city: "TP.HCM", start_date: "2026-03-20", end_date: "2026-03-23", headcount: 10, budget_vnd: 5000000, budget_mode: "per_person", preferences: ["biển", "ẩm thực"] },
+      itinerary: { days: [
+        { day: 1, title: "Đến nơi & biển Mỹ Khê", activities: ["Nhận phòng khách sạn", "Dạo biển hoàng hôn", "Hải sản bãi biển"] },
+        { day: 2, title: "Ngũ Hành Sơn & Hội An", activities: ["Leo núi buổi sáng", "Phố cổ Hội An", "Tour ẩm thực"] },
+        { day: 3, title: "Bà Nà Hills", activities: ["Cáp treo Bà Nà", "Cầu Vàng", "Tiệc tối team"] },
+      ]},
+      budget_ledger: { categories: { stay: { mid: 1800000 }, transport: { mid: 1200000 }, activities: { mid: 1500000 } }, total_per_person: { mid: 4500000 }, total_group: { mid: 45000000 }, headcount: 10 },
+    };
+
+    function normalizeItinerary(itinerary) {
+      if (!itinerary) return [];
+      const days = Array.isArray(itinerary) ? itinerary : (itinerary.days || []);
+      return days.map((d) => ({
+        day: d.day,
+        title: d.title || d.weather || `Ngày ${d.day}`,
+        items: d.items || d.activities || [],
+        note: d.note,
+        date: d.date,
+      }));
+    }
+
+    function normalizeBudget(ledger, headcount) {
+      if (!ledger) return { rows: [], perPerson: 0, total: 0 };
+      if (Array.isArray(ledger.categories)) {
+        return {
+          rows: ledger.categories.map((c) => ({ name: c.name, perPerson: c.per_person_vnd, total: c.total_vnd })),
+          perPerson: ledger.total_per_person_vnd || 0,
+          total: ledger.total_vnd || 0,
+        };
+      }
+      const rows = Object.entries(ledger.categories || {}).map(([name, c]) => ({
+        name: CATEGORIES_VI[name] || name,
+        perPerson: c.mid || c.low || 0,
+        total: (c.mid || c.low || 0) * (headcount || ledger.headcount || 1),
+      }));
+      return {
+        rows,
+        perPerson: (ledger.total_per_person || {}).mid || 0,
+        total: (ledger.total_group || {}).mid || 0,
+      };
+    }
+
+    function bindCardBlocks(root) {
+      root.querySelectorAll("[data-card]").forEach((el) => {
+        el.querySelector(".card-block-header").addEventListener("click", () => {
+          const open = el.classList.toggle("open");
+          el.querySelector(".card-block-header").setAttribute("aria-expanded", open);
+        });
+      });
+    }
+
+    function renderTripResults(data) {
+      const brief = data.trip_brief || {};
+      const container = document.getElementById("tripResults");
+      const dates = brief.start_date && brief.end_date
+        ? `${brief.start_date} → ${brief.end_date}` : "Chưa rõ ngày";
+      const days = normalizeItinerary(data.itinerary);
+      const budget = normalizeBudget(data.budget_ledger, brief.headcount);
+      const services = buildPreTripServices(brief);
+
+      container.innerHTML = `
+        <div class="card-block open" data-card>
+          <button type="button" class="card-block-header" aria-expanded="true">
+            <div>
+              <div class="card-title">Tóm tắt chuyến đi</div>
+              <div class="card-sub">${brief.destination_city || "—"} · ${brief.headcount || "?"} người · ${dates}</div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="card-block-body">${beautifyAgentText(data.response)}</div>
+        </div>
+
+        <div class="prep-banner">
+          <h3>📋 Chuẩn bị trước ngày 1 — qua Zalopay</h3>
+          <p>Trước khi bắt đầu lịch trình, team cần đặt phương tiện di chuyển và chỗ ở. Giá tham khảo (mock), API thật sẽ tích hợp sau.</p>
+        </div>
+        <div class="card-block open" data-card>
+          <button type="button" class="card-block-header" aria-expanded="true">
+            <div>
+              <div class="card-title">Dịch vụ Zalopay</div>
+              <div class="card-sub">Vé máy bay · xe · tàu · khách sạn · nhà nghỉ</div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="card-block-body">${renderServiceCards(services)}</div>
+        </div>
+
+        <div class="card-block" data-card>
+          <button type="button" class="card-block-header" aria-expanded="false">
+            <div>
+              <div class="card-title">Lịch trình từng ngày</div>
+              <div class="card-sub">${days.length} ngày · bắt đầu sau khi đã đặt vé &amp; phòng</div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="card-block-body">
+            ${days.length ? days.map((d) => `
+              <div class="day-plan">
+                <div class="day-plan-head">Ngày ${d.day}${d.date ? ` · ${d.date}` : ""}: ${d.title}</div>
+                ${d.note ? `<p style="margin:0 0 6px;font-size:0.78rem;color:var(--muted)">${d.note}</p>` : ""}
+                <ul>${(d.items || []).map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>
+              </div>`).join("") : "<p style='color:var(--muted)'>Chưa có lịch trình.</p>"}
+          </div>
+        </div>
+
+        <div class="card-block" data-card>
+          <button type="button" class="card-block-header" aria-expanded="false">
+            <div>
+              <div class="card-title">Ngân sách ước tính</div>
+              <div class="card-sub">${formatVnd(budget.perPerson)}/người</div>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="card-block-body">
+            ${budget.rows.map((c) => `<div class="budget-row"><span>${c.name}</span><span>${formatVnd(c.perPerson)}</span></div>`).join("")}
+            <div class="budget-row total"><span>Tổng / người</span><span>${formatVnd(budget.perPerson)}</span></div>
+          </div>
+        </div>`;
+
+      container.classList.add("visible");
+      bindCardBlocks(container);
+    }
+
+    document.getElementById("tripForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("tripInput").value.trim();
+      if (!msg) return;
+      const btn = document.getElementById("tripSubmitBtn");
+      btn.disabled = true;
+      btn.textContent = "Đang lên kế hoạch…";
+      try {
+        let data;
+        if (useLiveAgents) {
+          data = await apiPost("/api/trip", { message: msg });
+        } else {
+          await new Promise((r) => setTimeout(r, 900));
+          data = { ...MOCK_TRIP, response: MOCK_TRIP.response + `\n\n(Yêu cầu: "${msg.slice(0, 70)}…")` };
+        }
+        renderTripResults(data);
+      } catch (err) {
+        document.getElementById("tripResults").innerHTML = `<p style="color:var(--sub-pink)">${err.message}</p>`;
+        document.getElementById("tripResults").classList.add("visible");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Lên lịch trình";
+      }
+    });
+
+    const MOCK_BILL = {
+      balances: {
+        alice: { display_name: "An", phone: "0901234567", paid_vnd: 900000, owed_vnd: 400000, net_vnd: 500000 },
+        bob: { display_name: "Bình", phone: "0902345678", paid_vnd: 300000, owed_vnd: 400000, net_vnd: -100000 },
+        charlie: { display_name: "Chi", phone: "0903456789", paid_vnd: 0, owed_vnd: 400000, net_vnd: -400000 },
+      },
+      expenses: [
+        { merchant: "Hải sản BBQ", category: "food", total_vnd: 900000, payer: "An", payer_id: "alice" },
+        { merchant: "Grab", category: "transport", total_vnd: 300000, payer: "Bình", payer_id: "bob" },
+      ],
+      transfers: [
+        { from: "Chi", to: "An", amount_vnd: 400000 },
+        { from: "Bình", to: "An", amount_vnd: 100000 },
+      ],
+    };
+
+    const CATEGORY_EMOJI = { food: "🍜", transport: "🚕", stay: "🏨", activity: "🎯", other: "🧾" };
+
+    function genBillId() {
+      return "bill-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    }
+
+    function expenseToRecordedBill(e, i) {
+      const thumb = e.receipt_thumbnail_base64
+        ? `data:image/jpeg;base64,${e.receipt_thumbnail_base64}`
+        : (e.image_url || null);
+      return {
+        id: e.expense_id || e.id || genBillId(),
+        merchant: e.merchant || "Chi phí",
+        category: e.category || "other",
+        total_vnd: e.total_vnd,
+        payer_id: e.payer_id || Object.keys(billData?.balances || MOCK_BILL.balances)[i] || "unknown",
+        payer_name: e.payer_display_name || e.payer || e.payer_id,
+        image_url: thumb,
+        created_at: e.created_at || new Date().toISOString(),
+        note: e.notes || e.note || (e.has_receipt ? "Có ảnh chứng từ" : "Hóa đơn mẫu"),
+      };
+    }
+
+    function syncRecordedFromExpenses() {
+      if (recordedBills.length) return;
+      recordedBills = (billData?.expenses || MOCK_BILL.expenses).map(expenseToRecordedBill);
+    }
+
+    function renderReceiptSliderHtml() {
+      if (!recordedBills.length) {
+        return `<p style="font-size:0.78rem;color:var(--muted);margin:8px 0 0">Chưa có hóa đơn. Tải ảnh chuyển khoản hoặc hóa đơn tiền mặt ở trên.</p>`;
+      }
+      return `
+        <div class="receipt-slider-wrap">
+          <div class="receipt-slider-label">${recordedBills.length} hóa đơn đã ghi · chạm để xem chi tiết</div>
+          <div class="receipt-slider" id="receiptSlider">
+            ${recordedBills.map((b) => `
+              <div class="receipt-card" data-bill-id="${b.id}" tabindex="0">
+                <span class="receipt-hover-tip">${escapeHtml(b.merchant)} · ${formatVnd(b.total_vnd)}</span>
+                <div class="receipt-thumb">
+                  ${b.image_url
+                    ? `<img src="${b.image_url}" alt="${escapeHtml(b.merchant)}" />`
+                    : `<span class="receipt-thumb-placeholder">${CATEGORY_EMOJI[b.category] || "🧾"}</span>`}
+                </div>
+                <div class="receipt-card-body">
+                  <div class="receipt-card-merchant">${escapeHtml(b.merchant)}</div>
+                  <div class="receipt-card-amount">${formatVnd(b.total_vnd)}</div>
+                  <div class="receipt-card-payer">${escapeHtml(b.payer_name || "")}</div>
+                </div>
+              </div>`).join("")}
+          </div>
+        </div>`;
+    }
+
+    function openReceiptModal(billId) {
+      const bill = recordedBills.find((b) => b.id === billId);
+      if (!bill) return;
+      const overlay = document.getElementById("receiptModalOverlay");
+      const content = document.getElementById("receiptModalContent");
+      content.innerHTML = `
+        ${bill.image_url
+          ? `<img class="receipt-modal-image" src="${bill.image_url}" alt="Chứng từ" />`
+          : `<div class="receipt-modal-image" style="display:flex;align-items:center;justify-content:center;font-size:3rem">${CATEGORY_EMOJI[bill.category] || "🧾"}</div>`}
+        <div class="receipt-modal-body">
+          <div class="receipt-detail-row"><span>Cửa hàng</span><strong>${escapeHtml(bill.merchant)}</strong></div>
+          <div class="receipt-detail-row"><span>Số tiền</span><strong style="color:var(--main-green)">${formatVnd(bill.total_vnd)}</strong></div>
+          <div class="receipt-detail-row"><span>Người chi</span><strong>${escapeHtml(bill.payer_name || bill.payer_id)}</strong></div>
+          <div class="receipt-detail-row"><span>Loại</span><strong>${CATEGORIES_VI[bill.category] || bill.category}</strong></div>
+          <div class="receipt-detail-row"><span>Ghi chú</span><span>${escapeHtml(bill.note || "—")}</span></div>
+        </div>`;
+      overlay.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeReceiptModal() {
+      const overlay = document.getElementById("receiptModalOverlay");
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    function bindReceiptSlider() {
+      document.querySelectorAll(".receipt-card").forEach((card) => {
+        const id = card.dataset.billId;
+        card.addEventListener("click", () => openReceiptModal(id));
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openReceiptModal(id); }
+        });
+      });
+    }
+
+    document.getElementById("receiptModalClose").addEventListener("click", closeReceiptModal);
+    document.getElementById("receiptModalOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "receiptModalOverlay") closeReceiptModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeReceiptModal();
+    });
+
+    async function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function addExpenseToBill(expense, imageUrl) {
+      if (!billData) billData = { balances: {}, expenses: [], transfers: [] };
+      billData.expenses.push(expense);
+      recordedBills.unshift({
+        id: expense.id || genBillId(),
+        merchant: expense.merchant,
+        category: expense.category,
+        total_vnd: expense.total_vnd,
+        payer_id: expense.payer_id,
+        payer_name: expense.payer,
+        image_url: imageUrl,
+        created_at: new Date().toISOString(),
+        note: expense.note || "",
+      });
+      billsConfirmed = false;
+    }
+
+    function renderPayableList() {
+      const list = document.getElementById("payableList");
+      if (!list || !billData) return;
+      const q = payableFilter.trim().toLowerCase();
+      list.querySelectorAll(".payable-row").forEach((row) => {
+        const name = (row.dataset.name || "").toLowerCase();
+        row.classList.toggle("hidden", q && !name.includes(q));
+      });
+    }
+
+    function renderBillPanelBody() {
+      const body = document.getElementById("billPanelBody");
+      const data = billData || MOCK_BILL;
+      const expenseCount = data.expenses.length;
+      syncRecordedFromExpenses();
+
+      const memberOptions = teamMembers.length
+        ? teamMembers.map((m) => `<option value="${m.member_id}">${escapeHtml(m.display_name)}</option>`).join("")
+        : Object.entries(data.balances).map(([id, b]) => `<option value="${id}">${escapeHtml(b.display_name)}</option>`).join("");
+
+      body.innerHTML = `
+        <div class="bill-section">
+          <div class="bill-section-title"><span class="bill-section-num">1</span> Thêm thành viên nhóm</div>
+          <form class="member-form" id="memberForm">
+            <input type="text" id="memberName" placeholder="Tên hiển thị (VD: An)" required maxlength="40" />
+            <input type="tel" id="memberPhone" placeholder="Số điện thoại Zalopay (VD: 0901234567)" required />
+            <div class="form-error" id="memberError">Tên đã tồn tại trong nhóm.</div>
+            <button type="submit" class="btn btn-blue btn-sm btn-block">Thêm vào nhóm</button>
+          </form>
+          <div class="member-tags" id="memberTags">${teamMembers.map((m) => `<span class="member-tag">${escapeHtml(m.display_name)}</span>`).join("")}</div>
+        </div>
+
+        <div class="bill-section">
+          <div class="bill-section-title"><span class="bill-section-num">2</span> Tải hóa đơn &amp; chứng từ</div>
+          <p style="margin:0 0 10px;font-size:0.76rem;color:var(--muted)">Ảnh chuyển khoản, biên lai tiền mặt hoặc screenshot bill để ghi nhận chi phí.</p>
+          <form class="receipt-upload-form" id="receiptUploadForm">
+            <select id="receiptPayer" required>${memberOptions || '<option value="">— Thêm thành viên trước —</option>'}</select>
+            <input type="text" id="receiptMerchant" placeholder="Tên cửa hàng / mô tả" required />
+            <input type="number" id="receiptAmount" placeholder="Số tiền (VND)" min="1000" step="1000" required />
+            <select id="receiptCategory">
+              <option value="food">Ăn uống</option>
+              <option value="transport">Di chuyển</option>
+              <option value="stay">Lưu trú</option>
+              <option value="activity">Hoạt động</option>
+              <option value="other">Khác</option>
+            </select>
+            <label class="upload-zone" id="uploadZone">
+              <input type="file" id="receiptFile" accept="image/jpeg,image/png,image/webp" />
+              <div class="upload-zone-text" id="uploadZoneText">
+                <strong>Chạm để tải ảnh chứng từ</strong>
+                JPG, PNG, WebP · tối đa ~4 MB
+              </div>
+            </label>
+            <button type="submit" class="btn btn-green btn-sm btn-block">Thêm hóa đơn</button>
+          </form>
+          ${renderReceiptSliderHtml()}
+        </div>
+
+        <div class="bill-section">
+          <div class="bill-section-title"><span class="bill-section-num">3</span> Xác nhận hóa đơn</div>
+          <div class="confirm-status${billsConfirmed ? " done" : ""}" id="confirmStatus">
+            ${billsConfirmed
+              ? `✓ Đã xác nhận ${expenseCount} hóa đơn — sẵn sàng quyết toán`
+              : `Hiện có ${expenseCount} hóa đơn. Xác nhận khi đã nhập đủ chi phí chuyến đi.`}
+          </div>
+          <button type="button" class="btn btn-green btn-block" id="confirmBillsBtn" ${billsConfirmed ? "disabled" : ""}>
+            ${billsConfirmed ? "Đã xác nhận đủ" : "Xác nhận đủ hóa đơn"}
+          </button>
+        </div>
+
+        <div class="bill-section">
+          <div class="bill-section-title"><span class="bill-section-num">4</span> Số tiền cần trả</div>
+          <input type="text" class="filter-input" id="payableFilter" placeholder="Lọc theo tên thành viên…" value="${escapeHtml(payableFilter)}" />
+          <div id="payableList">
+            ${Object.entries(data.balances).map(([id, b]) => {
+              const net = b.net_vnd ?? b.net ?? 0;
+              const cls = net >= 0 ? "amount-receive" : "amount-owe";
+              const label = net >= 0 ? "nhận lại" : "cần trả";
+              return `
+              <div class="payable-row" data-name="${escapeHtml(b.display_name || id)}">
+                <div>
+                  <div class="payable-name">${escapeHtml(b.display_name || id)}</div>
+                  <div class="payable-phone">${b.phone || b.account_no || ""}</div>
+                </div>
+                <div class="${cls}">${formatVnd(Math.abs(net))} <span style="font-size:0.7rem;font-weight:500">${label}</span></div>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-blue btn-block" id="settleBtn"
+          ${!billsConfirmed || billSettled ? "disabled" : ""} style="margin-top:4px">
+          ${billSettled ? "Đã quyết toán" : "Quyết toán qua Zalopay"}
+        </button>
+        <div id="qrSection"></div>`;
+
+      document.getElementById("memberForm").addEventListener("submit", onAddMember);
+
+      const fileInput = document.getElementById("receiptFile");
+      const uploadZone = document.getElementById("uploadZone");
+      fileInput.addEventListener("change", () => {
+        pendingUploadFile = fileInput.files[0] || null;
+        uploadZone.classList.toggle("has-file", !!pendingUploadFile);
+        document.getElementById("uploadZoneText").innerHTML = pendingUploadFile
+          ? `<strong>✓ ${escapeHtml(pendingUploadFile.name)}</strong> Sẵn sàng tải lên`
+          : `<strong>Chạm để tải ảnh chứng từ</strong> JPG, PNG, WebP · tối đa ~4 MB`;
+      });
+
+      document.getElementById("receiptUploadForm").addEventListener("submit", onUploadReceipt);
+
+      document.getElementById("confirmBillsBtn").addEventListener("click", async () => {
+        if (data.expenses.length === 0) {
+          alert("Chưa có hóa đơn nào. Tải chứng từ trước khi xác nhận.");
+          return;
+        }
+        if (useLiveAgents) {
+          try {
+            await apiPost("/api/bill", { action: "confirm_bills" }, teamMembers[0]?.member_id);
+            billsConfirmed = true;
+            await refreshBillData();
+          } catch (err) {
+            alert("Lỗi xác nhận: " + err.message);
+            return;
+          }
+        } else {
+          billsConfirmed = true;
+          renderBillPanelBody();
+        }
+      });
+      document.getElementById("payableFilter").addEventListener("input", (e) => {
+        payableFilter = e.target.value;
+        renderPayableList();
+      });
+      document.getElementById("settleBtn").addEventListener("click", handleSettle);
+      bindReceiptSlider();
+    }
+
+    async function onUploadReceipt(e) {
+      e.preventDefault();
+      const payerId = document.getElementById("receiptPayer").value;
+      const merchant = document.getElementById("receiptMerchant").value.trim();
+      const amount = parseInt(document.getElementById("receiptAmount").value, 10);
+      const category = document.getElementById("receiptCategory").value;
+      if (!payerId || !merchant || !amount || amount < 1000) return;
+
+      const payerMember = teamMembers.find((m) => m.member_id === payerId);
+      const payerName = payerMember?.display_name
+        || billData?.balances[payerId]?.display_name || payerId;
+
+      let imageUrl = null;
+      let imageBase64 = null;
+      let mediaType = "image/jpeg";
+
+      if (pendingUploadFile) {
+        if (pendingUploadFile.size > 4 * 1024 * 1024) {
+          alert("Ảnh quá lớn (tối đa ~4 MB).");
+          return;
+        }
+        mediaType = pendingUploadFile.type || "image/jpeg";
+        imageUrl = URL.createObjectURL(pendingUploadFile);
+        imageBase64 = await fileToBase64(pendingUploadFile);
+      }
+
+      const memberIds = teamMembers.map((m) => m.member_id);
+      const splitAmong = memberIds.length ? memberIds : Object.keys(billData?.balances || {});
+
+      if (useLiveAgents && imageBase64) {
+        try {
+          const result = await apiPost("/api/bill", {
+            action: "upload_receipt",
+            image_base64: imageBase64,
+            image_media_type: mediaType,
+            payer_id: payerId,
+            category,
+            merchant,
+            total_vnd: amount,
+            member_ids: splitAmong,
+            notes: pendingUploadFile ? "Có ảnh chứng từ" : "",
+            message: `${merchant} ${amount}`,
+          }, payerId);
+          if (result.needs_confirm && result.expense) {
+            await apiPost("/api/bill", {
+              action: "confirm_expense",
+              expense_id: result.expense.expense_id,
+              total_vnd: amount,
+              merchant,
+              payer_id: payerId,
+              category,
+            }, payerId);
+          }
+          await refreshBillData();
+          recordedBills = [];
+          syncRecordedFromExpenses();
+        } catch (err) {
+          alert("Lỗi tải hóa đơn: " + err.message);
+          return;
+        }
+      } else if (useLiveAgents && !imageBase64) {
+        try {
+          await apiPost("/api/bill", {
+            action: "add_expense",
+            total_vnd: amount,
+            category,
+            merchant,
+            payer_id: payerId,
+            member_ids: splitAmong,
+          }, payerId);
+          await refreshBillData();
+          recordedBills = [];
+          syncRecordedFromExpenses();
+        } catch (err) {
+          alert("Lỗi: " + err.message);
+          return;
+        }
+      } else {
+        const expense = {
+          id: genBillId(),
+          merchant,
+          category,
+          total_vnd: amount,
+          payer: payerName,
+          payer_id: payerId,
+          note: pendingUploadFile ? "Có ảnh chứng từ" : "Không có ảnh",
+        };
+        addExpenseToBill(expense, imageUrl);
+        const hc = splitAmong.length || 1;
+        const share = Math.round(amount / hc);
+        if (billData.balances[payerId]) {
+          billData.balances[payerId].paid_vnd = (billData.balances[payerId].paid_vnd || 0) + amount;
+        }
+        splitAmong.forEach((mid) => {
+          if (billData.balances[mid]) {
+            billData.balances[mid].owed_vnd = (billData.balances[mid].owed_vnd || 0) + share;
+            billData.balances[mid].net_vnd = (billData.balances[mid].paid_vnd || 0) - (billData.balances[mid].owed_vnd || 0);
+          }
+        });
+      }
+
+      pendingUploadFile = null;
+      document.getElementById("receiptUploadForm").reset();
+      updateBillSummary();
+      renderBillPanelBody();
+    }
+
+    async function onAddMember(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById("memberName");
+      const phoneInput = document.getElementById("memberPhone");
+      const errEl = document.getElementById("memberError");
+      const name = nameInput.value.trim();
+      const phone = normalizePhone(phoneInput.value);
+
+      errEl.classList.remove("visible");
+      if (!name || phone.length < 10) return;
+
+      if (isDuplicateName(name)) {
+        errEl.classList.add("visible");
+        return;
+      }
+
+      const memberId = phone;
+      teamMembers.push({ member_id: memberId, display_name: name, phone });
+
+      if (useLiveAgents && zalopay.bankBin) {
+        try {
+          await apiPost("/api/bill", {
+            action: "register_member",
+            member_id: memberId,
+            display_name: name,
+            bank_bin: zalopay.bankBin,
+            bank_code: zalopay.bankCode || "ZLP",
+            account_no: phone,
+            account_name: stripDiacritics(name),
+          }, memberId);
+          await refreshBillData();
+        } catch (err) {
+          teamMembers.pop();
+          alert(err.message);
+          return;
+        }
+      } else {
+        if (!billData) billData = { balances: {}, expenses: [], transfers: [] };
+        billData.balances[memberId] = { display_name: name, phone, paid_vnd: 0, owed_vnd: 0, net_vnd: 0 };
+      }
+
+      nameInput.value = "";
+      phoneInput.value = "";
+      updateBillSummary();
+      renderBillPanelBody();
+    }
+
+    async function handleSettle() {
+      if (!billsConfirmed) return;
+      const btn = document.getElementById("settleBtn");
+      btn.disabled = true;
+      btn.textContent = "Đang quyết toán…";
+      let transfers = billData?.transfers || MOCK_BILL.transfers;
+      try {
+        if (useLiveAgents) {
+          const result = await apiPost("/api/bill", { action: "finalize" }, teamMembers[0]?.member_id || "alice");
+          transfers = result.transfers || [];
+          billSettled = true;
+        } else {
+          await new Promise((r) => setTimeout(r, 600));
+          billSettled = true;
+        }
+        document.getElementById("qrSection").innerHTML = transfers.map((t) => `
+          <div class="qr-block">
+            ${t.vietqr_url ? `<img src="${t.vietqr_url}" alt="VietQR" />` : `<div class="qr-placeholder">Mã Zalopay</div>`}
+            <div><strong>${t.from_display_name || t.from || t.from_member}</strong> → <strong>${t.to_display_name || t.to || t.to_member}</strong></div>
+            <div style="color:var(--main-green);font-weight:700;margin-top:4px">${formatVnd(t.amount_vnd)}</div>
+          </div>`).join("");
+        btn.textContent = "Đã quyết toán";
+      } catch (err) {
+        btn.textContent = "Thử lại";
+        btn.disabled = false;
+        alert(err.message);
+      }
+    }
+
+    async function refreshBillData() {
+      if (!useLiveAgents) return;
+      const userId = teamMembers[0]?.member_id;
+      const [bal, exp, members] = await Promise.all([
+        apiPost("/api/bill", { action: "list_balances" }, userId),
+        apiPost("/api/bill", { action: "list_expenses" }, userId),
+        apiPost("/api/bill", { action: "list_members" }, userId).catch(() => ({ members: [] })),
+      ]);
+
+      if (members.members?.length) {
+        teamMembers = members.members.map((m) => ({
+          member_id: m.member_id,
+          display_name: m.display_name,
+          phone: m.account_no || m.member_id,
+        }));
+      }
+
+      billData = {
+        balances: Object.fromEntries(
+          Object.entries(bal.balances || {}).map(([id, b]) => [
+            id,
+            { ...b, phone: b.account_no || b.phone },
+          ]),
+        ),
+        expenses: exp.expenses || [],
+        transfers: [],
+      };
+      billSettled = bal.session_status === "settled";
+      billsConfirmed = bal.session_status === "ready_to_settle" || billSettled;
+      updateBillSummary();
+      if (billExpanded) renderBillPanelBody();
+    }
+
+    function toggleBillPanel() {
+      billExpanded = !billExpanded;
+      document.getElementById("billPanel").classList.toggle("expanded", billExpanded);
+      document.getElementById("billPanelToggle").setAttribute("aria-expanded", billExpanded);
+      if (billExpanded) renderBillPanelBody();
+    }
+
+    document.getElementById("billPanelToggle").addEventListener("click", toggleBillPanel);
+
+    async function initBill() {
+      billData = {
+        balances: { ...MOCK_BILL.balances },
+        expenses: [...MOCK_BILL.expenses],
+        transfers: [...MOCK_BILL.transfers],
+      };
+      teamMembers = Object.entries(MOCK_BILL.balances).map(([id, b]) => ({
+        member_id: id, display_name: b.display_name, phone: b.phone,
+      }));
+      recordedBills = [];
+      syncRecordedFromExpenses();
+      if (useLiveAgents) {
+        try { await refreshBillData(); recordedBills = []; syncRecordedFromExpenses(); } catch (_) { /* giữ mock */ }
+      }
+      updateBillSummary();
+    }
+
+    document.getElementById("modeBadge").textContent = useLiveAgents ? "live" : "demo";
+    loadCityForecast("Hanoi");
+    ["Ho Chi Minh City", "Da Nang"].forEach((c) => fetchForecast(c).catch(() => {}));
+    initBill();
+  </script>
+</body>
+</html>

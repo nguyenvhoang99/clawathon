@@ -1,0 +1,9 @@
+{
+  "categories": [
+    {"id": "food", "label": "Food & dining"},
+    {"id": "transport", "label": "Transport"},
+    {"id": "stay", "label": "Accommodation"},
+    {"id": "activity", "label": "Activities & tickets"},
+    {"id": "other", "label": "Other"}
+  ]
+}

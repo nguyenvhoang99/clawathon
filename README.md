@@ -2,7 +2,20 @@
 
 A hackathon workspace for designing, building, and deploying an AI agent on [GreenNode AgentBase](https://aiplatform.console.vngcloud.vn/).
 
-> **Agent purpose:** To be defined. Use this repo to explore ideas, scaffold the agent, and iterate toward a final use case.
+> **Agent purpose:** Vietnam team trip planner (~10 members) — multi-agent LangGraph orchestrator for stays, transport, activities, weather-aware itineraries, and budget planning.
+
+## Project layout
+
+```
+agents/
+├── weather-chatbot/   # Original weather Q&A agent (legacy)
+├── trip-planner/      # Team trip planner (primary)
+└── bill-splitter/     # Expense tracking + VietQR settlement
+
+web/                   # Team trip demo website (see web/README.md)
+```
+
+See [agents/trip-planner/.env.example](agents/trip-planner/.env.example) for configuration.
 
 ## What This Repo Is For
 
@@ -207,16 +220,69 @@ Use helper scripts under `.cursor/skills/agentbase/scripts/` for tokens and cred
 - [IAM Service Accounts](https://iam.console.vngcloud.vn/service-accounts)
 - [Access Control Console](https://aiplatform.console.vngcloud.vn/access-control)
 
-## Open Questions
+## Weather Chatbot
 
-Track decisions here as the team aligns on the hackathon goal:
+LangChain agent with two tools:
 
-- [ ] **Agent purpose** — What problem are we solving?
-- [ ] **Target users** — Who interacts with the agent?
-- [ ] **Channels** — HTTP API, Telegram, Zalo, or other?
-- [ ] **Memory** — Session-only vs long-term user memory?
-- [ ] **External integrations** — Which APIs or MCP tools?
-- [ ] **Deployment mode** — Public runtime vs VPC?
+- `get_current_weather(city)` — live temperature, humidity, wind, conditions
+- `get_weather_forecast(city, days)` — up to 7-day forecast
+
+Weather data comes from Open-Meteo (free, no API key). The LLM is powered by GreenNode AI Platform.
+
+### Test locally
+
+```bash
+cp .env.example .env
+# Fill in LLM_API_KEY and LLM_MODEL (see Environment Variables below)
+
+python3 main.py
+
+curl -X POST http://127.0.0.1:8080/invocations \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What is the weather in Hanoi today?"}'
+```
+
+### Deploy
+
+```bash
+/agentbase-deploy
+```
+
+Or confirm deployment in Cursor chat after setting credentials below.
+
+## Environment Variables
+
+### For local dev + deploy CLI (your machine)
+
+Set these so AgentBase skills can call platform APIs:
+
+```bash
+export GREENNODE_CLIENT_ID="<from IAM service account>"
+export GREENNODE_CLIENT_SECRET="<from IAM service account>"
+```
+
+Or fill in `.greennode.json` (gitignored).
+
+Create a service account at [IAM Console](https://iam.console.vngcloud.vn/service-accounts) with `AgentBaseFullAccess`, `vcrFullAccess`, and `AiPlatformFullAccess`.
+
+### For the agent runtime (`.env` passed at deploy)
+
+Only LLM config is required — **do not** put `GREENNODE_*` vars in deploy `.env` (runtime auto-injects them):
+
+| Variable | Required | Example / Notes |
+|----------|----------|-----------------|
+| `LLM_API_KEY` | Yes | Create via `/agentbase-llm api-keys create --name weather-chatbot-key` |
+| `LLM_BASE_URL` | Yes | `https://maas-llm-aiplatform-hcm.api.vngcloud.vn/v1` |
+| `LLM_MODEL` | Yes | Pick an ENABLED model via `/agentbase-llm models list` |
+
+### Auto-injected at runtime (do NOT set manually)
+
+| Variable | Description |
+|----------|-------------|
+| `GREENNODE_CLIENT_ID` | Runtime IAM service account |
+| `GREENNODE_CLIENT_SECRET` | Runtime IAM secret |
+| `GREENNODE_AGENT_IDENTITY` | Agent identity name |
+| `GREENNODE_ENDPOINT_URL` | Public endpoint URL |
 
 ---
 
