@@ -899,13 +899,36 @@
         .replace(/[^A-Za-z0-9 ]+/g, "").replace(/\s+/g, " ").trim().slice(0, 25) || "Trip thu quy";
     }
 
-    function buildVietQrUrl({ bankBin, accountNo, accountName, amount, transferContent }) {
-      const bin = (bankBin || ZALOPAY_BANK_BIN).trim();
-      const acct = accountNo.trim();
-      const name = encodeURIComponent(accountName.trim());
-      const info = encodeURIComponent(sanitizeTransferContent(transferContent || "Trip thu quy"));
-      const base = `https://img.vietqr.io/image/${bin}-${acct}-compact2.png`;
-      return `${base}?amount=${Math.round(amount)}&addInfo=${info}&accountName=${name}`;
+    async function fetchVietQrUrl({ bankBin, accountNo, accountName, amount, transferContent }) {
+      const bin = (bankBin || zalopay.bankBin || ZALOPAY_BANK_BIN).trim();
+      const res = await fetch(`${proxyBase}/api/vietqr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bank_bin: bin,
+          account_no: accountNo.trim(),
+          account_name: (accountName || accountNo).trim(),
+          amount_vnd: Math.round(amount),
+          transfer_content: sanitizeTransferContent(transferContent || "Trip thu quy"),
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `VietQR failed (${res.status})`);
+      }
+      const data = await res.json();
+      return data.vietqr_url || data.data_url;
+    }
+
+    async function applyVietQrToImg(img, params) {
+      if (!img) return;
+      img.alt = "Đang tạo mã QR…";
+      try {
+        img.src = await fetchVietQrUrl(params);
+        img.alt = "VietQR Zalopay";
+      } catch (_) {
+        img.alt = "Không tạo được mã QR";
+      }
     }
 
     function renderCollapsibleSection(key, title, subtitle, bodyHtml) {
@@ -1506,15 +1529,7 @@
       const ctx = tripContext;
       const contrib = ctx?.contributionPerMember || 0;
       const host = treasurerHost;
-      const hostQrUrl = (host.phone && contrib > 0)
-        ? buildVietQrUrl({
-            bankBin: ZALOPAY_BANK_BIN,
-            accountNo: host.phone,
-            accountName: host.phone,
-            amount: contrib,
-            transferContent: `Thu quy ${ctx?.destination || "trip"}`,
-          })
-        : null;
+      const showHostQr = !!(host.phone && contrib > 0);
 
       const memberOptions = teamMembers.length
         ? teamMembers.map((m) => `<option value="${m.member_id}">${escapeHtml(m.display_name)}</option>`).join("")
@@ -1533,9 +1548,9 @@
           <input type="tel" id="hostPhone" placeholder="SĐT Zalopay nhận tiền (VD: 0901234567)" value="${escapeHtml(host.phone)}" required />
           <button type="submit" class="btn btn-blue btn-sm btn-block">Tạo mã QR thu quỹ</button>
         </form>
-        ${hostQrUrl ? `
+        ${showHostQr ? `
           <div class="qr-block" id="treasuryQrBlock">
-            <img src="${hostQrUrl}" alt="VietQR thu quỹ" />
+            <img src="" alt="Đang tạo mã QR…" data-vietqr-pending="1" />
             <div><strong>${escapeHtml(host.name || "Thủ quỹ")}</strong></div>
             <div style="font-size:0.72rem;color:var(--muted)">${escapeHtml(host.phone)} · Zalopay</div>
             <div style="color:var(--main-green);font-weight:700;margin-top:4px">${formatVnd(contrib)}/người</div>
@@ -1615,6 +1630,16 @@
         + renderCollapsibleSection("quyetToan", "⚖️ Quyết toán", computeBillSummary(data.balances), quyetToanHtml);
 
       bindBillSections(body);
+
+      if (showHostQr) {
+        applyVietQrToImg(document.querySelector("#treasuryQrBlock img"), {
+          bankBin: zalopay.bankBin || ZALOPAY_BANK_BIN,
+          accountNo: host.phone,
+          accountName: host.phone,
+          amount: contrib,
+          transferContent: `Thu quy ${ctx?.destination || "trip"}`,
+        });
+      }
 
       document.getElementById("hostForm").addEventListener("submit", (e) => {
         e.preventDefault();
@@ -1845,7 +1870,7 @@
           if (!billsConfirmed && recordedBills.length) billsConfirmed = true;
           await new Promise((r) => setTimeout(r, 600));
           billSettled = true;
-          transfers = (billData?.transfers || MOCK_BILL.transfers).map((t) => {
+          transfers = await Promise.all((billData?.transfers || MOCK_BILL.transfers).map(async (t) => {
             const toMember = teamMembers.find((m) => m.display_name === (t.to || t.to_display_name))
               || teamMembers[0];
             const fromMember = teamMembers.find((m) => m.display_name === (t.from || t.from_display_name))
@@ -1856,15 +1881,15 @@
               from_display_name: t.from || t.from_display_name,
               to_display_name: t.to || t.to_display_name,
               amount_vnd: t.amount_vnd,
-              vietqr_url: buildVietQrUrl({
-                bankBin: ZALOPAY_BANK_BIN,
+              vietqr_url: await fetchVietQrUrl({
+                bankBin: zalopay.bankBin || ZALOPAY_BANK_BIN,
                 accountNo: phone,
                 accountName: phone,
                 amount: t.amount_vnd,
                 transferContent: `Settle ${t.from || t.from_display_name}`,
               }),
             };
-          });
+          }));
         }
         document.getElementById("qrSection").innerHTML = transfers.length ? transfers.map((t) => `
           <div class="qr-block">

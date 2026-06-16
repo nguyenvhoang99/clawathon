@@ -2,6 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+COPY web/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
 COPY web/ /app/
 COPY agents/trip-planner/data/zalopay_flight_est_price.json /app/data/
 COPY agents/trip-planner/data/zalopay_hotel_est_price.json /app/data/

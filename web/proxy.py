@@ -12,6 +12,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
 from estimate_service import build_estimates
+from vietqr_emv import build_vietqr_image, build_vietqr_url, should_render_locally
 
 WEB_DIR = Path(__file__).resolve().parent
 CONFIG_PATH = WEB_DIR / "config.js"
@@ -105,6 +106,52 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:
         path = self.path.split("?", 1)[0]
+        if path == "/api/vietqr":
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length) if length else b"{}"
+            try:
+                payload = json.loads(body.decode("utf-8") or "{}")
+                bank_bin = str(payload.get("bank_bin", "")).strip()
+                account_no = str(payload.get("account_no", "")).strip()
+                account_name = str(payload.get("account_name", account_no)).strip()
+                amount_vnd = int(payload.get("amount_vnd", 0))
+                transfer_content = str(payload.get("transfer_content", "Trip settle"))
+                if not bank_bin or not account_no:
+                    raise ValueError("bank_bin and account_no are required")
+                image = build_vietqr_image(
+                    bank_bin=bank_bin,
+                    account_no=account_no,
+                    account_name=account_name,
+                    amount_vnd=amount_vnd,
+                    transfer_content=transfer_content,
+                )
+                vietqr_url = build_vietqr_url(
+                    bank_bin=bank_bin,
+                    account_no=account_no,
+                    account_name=account_name,
+                    amount_vnd=amount_vnd,
+                    transfer_content=transfer_content,
+                )
+                result = {
+                    "payload": image.payload,
+                    "vietqr_url": vietqr_url,
+                    "data_url": image.data_url,
+                    "local": should_render_locally(bank_bin),
+                }
+                data = json.dumps(result, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+            except Exception as exc:
+                err = json.dumps({"error": str(exc)}).encode("utf-8")
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(err)
+            return
+
         if path == "/api/estimates":
             length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(length) if length else b"{}"
@@ -172,7 +219,7 @@ def main() -> None:
     server = HTTPServer((host, port), Handler)
     print(f"Serving {WEB_DIR} at http://{host}:{port}")
     print("Agent proxy routes:", ", ".join(ROUTE_MAP))
-    print("Local routes: /api/estimates")
+    print("Local routes: /api/estimates, /api/vietqr")
     if not ENDPOINTS:
         print("Warning: no endpoints loaded — copy config.example.js to config.js")
     server.serve_forever()
