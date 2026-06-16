@@ -3,14 +3,14 @@
  *   cp config.example.js config.js
  */
 window.AGENT_CONFIG = {
-  useLiveAgents: false,
-  proxyBase: "http://127.0.0.1:3000",
+  useLiveAgents: true,
+  proxyBase: "",
   teamId: "team-web-demo",
   sessionId: "session-1",
   zalopay: {
     providerName: "Zalopay (Zion)",
     bankCode: "ZLP",
-    bankBin: "",
+    bankBin: "971101",
     brandColor: "#0033c9",
   },
   endpoints: {

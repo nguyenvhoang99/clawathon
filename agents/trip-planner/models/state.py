@@ -20,6 +20,9 @@ class TripState(TypedDict, total=False):
     weather_results: dict[str, Any]
     budget_ledger: dict[str, Any]
     itinerary: dict[str, Any]
+    plan: dict[str, Any]
     response: str
     data_sources: list[str]
     phase: str
+    intake_field: str
+    location_prompt: bool

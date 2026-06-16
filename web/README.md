@@ -54,14 +54,29 @@ bash web/scripts/run_live.sh
 
 This starts `proxy.py`, runs API smoke tests (weather, trip, bill with ZaloPay phones), then keeps the server running at http://127.0.0.1:3000.
 
-### 3. API-only verification (proxy must already be running)
+### 3. API deploy test suite (recommended after each deploy)
+
+```bash
+# Smoke (~30s) against live runtime
+bash web/scripts/run_api_tests.sh smoke https://endpoint-....agentbase-runtime.../
+
+# Full E2E (~3 min) — trip plan + bill settlement
+bash web/scripts/run_api_tests.sh full https://endpoint-....agentbase-runtime.../
+
+# Local proxy (start proxy.py first on :8080)
+bash web/scripts/run_api_tests.sh smoke http://127.0.0.1:8080
+```
+
+Tests live in `web/tests/test_deploy_api.py` (stdlib `unittest`, no extra deps).
+
+### 4. Legacy API verification (proxy must already be running)
 
 ```bash
 cd web && python3 proxy.py &
 bash web/scripts/verify_live.sh
 ```
 
-### 4. Direct bill-splitter runtime (ZaloPay phones)
+### 5. Direct bill-splitter runtime (ZaloPay phones)
 
 ```bash
 export ZALOPAY_BIN="<your-napas-bin>"

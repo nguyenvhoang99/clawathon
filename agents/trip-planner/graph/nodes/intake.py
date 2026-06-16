@@ -6,6 +6,12 @@ from datetime import date
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
+from graph.nodes.date_utils import (
+    coerce_dates_to_current_year_if_omitted,
+    parse_dates_from_text,
+    resolve_year_month,
+    year_explicit_in_text,
+)
 from models.trip_brief import TripBrief, TripStatus
 
 
@@ -24,7 +30,9 @@ Return ONLY valid JSON with these keys (use null for unknown):
 }
 Use Vietnamese city names in English (e.g. "Da Nang", "Ho Chi Minh City", "Hanoi").
 If budget is given per person, set budget_mode to "per_person".
-Parse dates like "Mar 20-23" using the current year if year omitted."""
+Today's reference date is {today}. If month is omitted when parsing dates, use the current month.
+If year is omitted, use the current year ({year}). Never default to 2024 or other past years.
+Parse Vietnamese dates like "20-23/3", "20-23/6/2026", or "20/3" accordingly."""
 
 
 def _parse_vnd(text: str) -> int | None:
@@ -50,20 +58,29 @@ def _rule_extract(message: str) -> dict:
     cities = {
         "da nang": "Da Nang",
         "danang": "Da Nang",
+        "đà nẵng": "Da Nang",
         "hanoi": "Hanoi",
+        "ha noi": "Hanoi",
+        "hà nội": "Hanoi",
         "ho chi minh": "Ho Chi Minh City",
         "hcmc": "Ho Chi Minh City",
         "saigon": "Ho Chi Minh City",
+        "tp.hcm": "Ho Chi Minh City",
+        "tp hcm": "Ho Chi Minh City",
         "nha trang": "Nha Trang",
         "phu quoc": "Phu Quoc",
+        "phú quốc": "Phu Quoc",
         "hue": "Hue",
+        "huế": "Hue",
         "hoi an": "Hoi An",
+        "hội an": "Hoi An",
     }
     found = [(key, name) for key, name in cities.items() if key in lower]
     found_names = [name for _, name in found]
 
-    if " from " in f" {lower} " and found:
-        parts = re.split(r"\bfrom\b", lower, maxsplit=1)
+    origin_markers = re.search(r"\b(từ|from)\b", lower)
+    if origin_markers:
+        parts = re.split(r"\b(?:từ|from)\b", lower, maxsplit=1)
         dest_part, origin_part = parts[0], parts[1] if len(parts) > 1 else ""
         for key, name in cities.items():
             if key in origin_part:
@@ -94,23 +111,22 @@ def _rule_extract(message: str) -> dict:
         if pref in lower:
             data["preferences"].append(pref)
 
-    date_match = re.search(
-        r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{1,2})\s*[-–]\s*(\d{1,2})",
-        lower,
-    )
-    if date_match:
-        months = {
-            "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
-            "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
-        }
-        month = months[date_match.group(1)[:3]]
-        year = date.today().year
-        start_day = int(date_match.group(2))
-        end_day = int(date_match.group(3))
-        data["start_date"] = date(year, month, start_day)
-        data["end_date"] = date(year, month, end_day)
+    data.update(parse_dates_from_text(message))
 
     return data
+
+
+def _user_denied_location(message: str) -> bool:
+    lower = message.lower()
+    patterns = (
+        r"t[uừ]\s*ch[oố]i",
+        r"kh[oô]ng\s*(cho\s*ph[eé]p|đ[ồo]ng\s*[ýy]|chia\s*s[eẻ]|d[uù]ng\s*v[iị]\s*tr[ií])",
+        r"location\s*denied",
+        r"deny\s*location",
+        r"kh[oô]ng\s*,?\s*t[oô]i\s*s[eẽ]\s*nh[aậ]p",
+        r"nh[aậ]p\s*th[uủ]\s*c[oô]ng",
+    )
+    return any(re.search(p, lower) for p in patterns)
 
 
 def merge_brief(existing: TripBrief, extracted: dict) -> TripBrief:
@@ -118,6 +134,14 @@ def merge_brief(existing: TripBrief, extracted: dict) -> TripBrief:
     merged = existing.model_copy(update=updates)
     merged.refresh_missing_fields()
     return merged
+
+
+def _normalize_brief_dates(message: str, brief: TripBrief) -> TripBrief:
+    start, end = coerce_dates_to_current_year_if_omitted(message, brief.start_date, brief.end_date)
+    if start != brief.start_date or end != brief.end_date:
+        brief = brief.model_copy(update={"start_date": start, "end_date": end})
+        brief.refresh_missing_fields()
+    return brief
 
 
 def intake_node(state: dict, llm) -> dict:
@@ -131,9 +155,13 @@ def intake_node(state: dict, llm) -> dict:
 
     if brief.missing_fields:
         try:
+            today = date.today()
+            prompt = (
+                INTAKE_PROMPT.replace("{today}", today.isoformat()).replace("{year}", str(today.year))
+            )
             response = llm.invoke(
                 [
-                    SystemMessage(content=INTAKE_PROMPT),
+                    SystemMessage(content=prompt),
                     HumanMessage(content=message),
                 ]
             )
@@ -145,28 +173,52 @@ def intake_node(state: dict, llm) -> dict:
             llm_data = json.loads(content)
             for key in ("start_date", "end_date"):
                 if llm_data.get(key):
-                    llm_data[key] = date.fromisoformat(llm_data[key])
+                    parsed = date.fromisoformat(llm_data[key])
+                    if year_explicit_in_text(message):
+                        year, month = resolve_year_month(parsed.year, parsed.month)
+                        llm_data[key] = date(year, month, parsed.day)
+                    else:
+                        year, month = resolve_year_month(None, parsed.month)
+                        llm_data[key] = date(year, month, parsed.day)
             brief = merge_brief(brief, llm_data)
         except (json.JSONDecodeError, ValueError, TypeError):
             pass
 
+    brief = _normalize_brief_dates(message, brief)
     brief.refresh_missing_fields()
 
     if brief.missing_fields:
         field = brief.missing_fields[0]
-        prompts = {
-            "origin_city": "Where is your team traveling from? (e.g. Ho Chi Minh City)",
-            "destination_city": "Which city in Vietnam would you like to visit?",
-            "start_date": "What is the trip start date? (YYYY-MM-DD)",
-            "end_date": "What is the trip end date? (YYYY-MM-DD)",
-            "budget_vnd": "What is your budget per person in VND? (e.g. 5000000)",
-            "headcount": "How many people are traveling?",
-        }
-        question = prompts.get(field, f"Please provide: {field}")
+        location_prompt = False
+        if field == "origin_city":
+            if _user_denied_location(message):
+                question = (
+                    "Bạn chưa cung cấp điểm khởi hành. Không có thông tin này, mình không thể ước tính "
+                    "vé máy bay/tàu/xe và chi phí di chuyển chính xác. "
+                    "Vui lòng nhập thành phố hoặc tỉnh xuất phát trong ô nhập (vd: TP.HCM, Hà Nội, Đà Nẵng)."
+                )
+            else:
+                question = (
+                    "Mình chưa biết team bạn khởi hành từ đâu. Bạn có thể cho phép truy cập vị trí "
+                    "để mình tự điền thành phố/tỉnh xuất phát, hoặc gõ trực tiếp trong ô nhập "
+                    "(vd: TP.HCM, Hà Nội). Chọn «Cho phép vị trí» bên dưới hoặc nhập thủ công."
+                )
+                location_prompt = True
+        else:
+            prompts = {
+                "destination_city": "Bạn muốn đi thành phố nào ở Việt Nam? (vd: Đà Nẵng, Nha Trang)",
+                "start_date": "Ngày bắt đầu chuyến đi là khi nào? (vd: 20/3/2026)",
+                "end_date": "Ngày kết thúc chuyến đi là khi nào? (vd: 23/3/2026)",
+                "budget_vnd": "Ngân sách dự kiến mỗi người là bao nhiêu VND? (vd: 5000000)",
+                "headcount": "Có bao nhiêu người tham gia chuyến đi?",
+            }
+            question = prompts.get(field, f"Vui lòng cung cấp: {field}")
         return {
             "trip_brief": brief.model_dump(mode="json"),
             "phase": "intake",
             "response": question,
+            "intake_field": field,
+            "location_prompt": location_prompt,
         }
 
     brief.status = TripStatus.SEARCHING

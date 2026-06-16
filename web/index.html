@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chuyến đi nhóm — Zalopay</title>
+  <title>Chuyến đi nhóm — Team Trip Planner</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -48,6 +48,17 @@
     }
     .site-header h1 span.brand { color: var(--main-green); }
     .site-header p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+    .site-footer {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .site-footer strong { color: var(--main-blue); font-weight: 600; }
 
     .workspace {
       display: grid;
@@ -162,6 +173,18 @@
     .trip-results { margin-top: 18px; display: none; }
     .trip-results.visible { display: block; }
 
+    .location-prompt {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+    }
+    .location-prompt .btn-outline {
+      background: var(--white); color: var(--main-blue); border: 1px solid var(--border);
+    }
+    .location-prompt .btn-outline:hover { background: var(--bg); }
+    .location-status {
+      margin-top: 10px; font-size: 0.82rem; color: var(--muted);
+    }
+    .location-status.error { color: var(--sub-pink); }
+
     .card-block {
       border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px;
       overflow: hidden; background: var(--white);
@@ -192,23 +215,62 @@
     .prep-banner h3 { margin: 0 0 4px; font-size: 0.88rem; color: var(--main-blue); }
     .prep-banner p { margin: 0; font-size: 0.78rem; color: var(--muted); }
 
-    .service-grid { display: grid; gap: 10px; margin-top: 10px; }
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
     .service-card {
-      display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
-      padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 148px;
+      aspect-ratio: 1;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
     }
     .service-card.transport { border-left: 3px solid var(--sub-cyan); }
     .service-card.stay { border-left: 3px solid var(--sub-purple); }
+    .service-card.local { border-left: 3px solid var(--sub-orange); }
+    .service-card.activity { border-left: 3px solid var(--sub-lime); }
     .service-type { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
     .service-type.transport { color: var(--sub-cyan); }
     .service-type.stay { color: var(--sub-purple); }
+    .service-type.local { color: var(--sub-orange); }
+    .service-type.activity { color: var(--main-green); }
     .service-name { font-weight: 600; font-size: 0.88rem; margin: 2px 0; }
     .service-note { font-size: 0.75rem; color: var(--muted); }
-    .service-price { font-weight: 700; color: var(--main-green); font-size: 0.88rem; white-space: nowrap; }
+    .service-price { font-weight: 700; color: var(--main-green); font-size: 0.82rem; white-space: normal; text-align: left; margin-top: auto; }
+    .service-price-est { font-size: 0.62rem; font-weight: 500; color: var(--muted); }
     .service-action {
-      margin-top: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 600;
-      background: var(--main-blue); color: var(--white); border: none; cursor: pointer;
+      display: inline-block; margin-top: 6px; padding: 4px 10px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 600; background: var(--main-blue); color: var(--white);
+      text-decoration: none;
     }
+    .service-action:hover { filter: brightness(1.08); }
+    .service-card.zalopay-card { border-left-color: var(--main-blue); box-shadow: 0 0 0 1px rgba(0, 51, 201, 0.12); }
+    .zalopay-badge {
+      display: inline-block; margin-bottom: 4px; padding: 2px 8px; border-radius: 999px;
+      font-size: 0.62rem; font-weight: 700; background: rgba(0, 51, 201, 0.12); color: var(--main-blue);
+    }
+    .service-card.qr-slot {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .service-card.qr-slot img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .budget-inline { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); }
+    .budget-inline-title { font-size: 0.82rem; font-weight: 700; color: var(--main-blue); margin-bottom: 8px; }
 
     .day-plan {
       padding: 12px 0; border-bottom: 1px dashed var(--border);
@@ -238,17 +300,52 @@
     .col-bill.expanded .bill-panel-body { display: block; }
 
     .bill-section {
-      margin-bottom: 16px; padding: 14px; border-radius: 12px;
-      border: 1px solid var(--border); background: var(--bg);
+      margin-bottom: 10px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--white); overflow: hidden;
     }
+    .bill-section-toggle {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; padding: 12px 14px; border: none; background: var(--bg);
+      font: inherit; text-align: left; cursor: pointer;
+    }
+    .bill-section-toggle:hover { background: #e8eef9; }
     .bill-section-title {
-      font-size: 0.82rem; font-weight: 700; color: var(--main-blue);
-      margin: 0 0 10px; display: flex; align-items: center; gap: 6px;
+      font-size: 0.84rem; font-weight: 700; color: var(--main-blue); margin: 0;
     }
+    .bill-section-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .bill-section-chevron { width: 16px; height: 16px; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+    .bill-section.open .bill-section-chevron { transform: rotate(180deg); }
+    .bill-section-body { display: none; padding: 12px 14px 14px; border-top: 1px solid var(--border); }
+    .bill-section.open .bill-section-body { display: block; }
     .bill-section-num {
       width: 20px; height: 20px; border-radius: 50%; background: var(--main-green);
       color: var(--white); font-size: 0.7rem; display: inline-flex; align-items: center; justify-content: center;
+      margin-right: 4px;
     }
+    .trip-link-badge {
+      display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.68rem;
+      font-weight: 600; background: rgba(0, 51, 201, 0.1); color: var(--main-blue); margin-bottom: 8px;
+    }
+    .contrib-highlight {
+      padding: 10px 12px; border-radius: 8px; margin-bottom: 10px;
+      background: rgba(0, 207, 106, 0.08); border: 1px solid rgba(0, 207, 106, 0.25);
+      font-size: 0.82rem;
+    }
+    .contrib-highlight strong { color: var(--main-green); font-size: 1rem; }
+    .input-mode-tabs {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .input-mode-tab {
+      flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px;
+      background: var(--white); font: inherit; font-size: 0.76rem; font-weight: 600;
+      cursor: pointer; color: var(--muted);
+    }
+    .input-mode-tab.active {
+      border-color: var(--main-blue); background: rgba(0, 51, 201, 0.08); color: var(--main-blue);
+    }
+    .ocr-only-fields { display: none; }
+    .ocr-mode .manual-only-fields { display: none; }
+    .ocr-mode .ocr-only-fields { display: block; }
 
     .member-form { display: flex; flex-direction: column; gap: 8px; }
     .member-form input {
@@ -397,25 +494,21 @@
 <body>
   <div class="page">
     <header class="site-header">
-      <h1><span class="brand">Zalopay</span> · Chuyến đi nhóm <span class="mode-badge" id="modeBadge">demo</span></h1>
-      <p>Thời tiết, lên kế hoạch và chia hóa đơn cho team — tích hợp dịch vụ Zalopay.</p>
+      <h1>Chuyến đi nhóm <span class="mode-badge" id="modeBadge">demo</span></h1>
+      <p>Lên kế hoạch chuyến đi cho team — kèm thời tiết và thủ quỹ khi cần thiết.</p>
     </header>
 
     <div class="workspace">
       <aside class="col col-weather">
         <h2>Thời tiết</h2>
-        <p class="section-hint">Hỏi chatbot hoặc xem dự báo 7 ngày.</p>
         <form class="weather-chat" id="weatherChatForm">
-          <input type="text" id="weatherInput" placeholder="VD: Tuần này Đà Nẵng mưa không?" autocomplete="off" />
-          <button type="submit" class="btn btn-green btn-sm" id="weatherSendBtn">Hỏi</button>
+          <input type="text" id="weatherInput" placeholder="Hôm nay Hà Nội thế nào?" autocomplete="off" />
+          <button type="submit" class="btn btn-green btn-sm" id="weatherSendBtn">Gửi</button>
         </form>
-        <div class="weather-reply empty" id="weatherReply" role="status">Thử: "Hôm nay Hà Nội thế nào?"</div>
+        <div class="weather-reply empty" id="weatherReply" role="status" hidden></div>
 
         <div class="weather-block-divider">
-          <p class="city-section-label">
-            Top 3 thành phố du lịch Việt Nam
-            <span>Dự báo 7 ngày tới · Hà Nội · TP.HCM · Đà Nẵng</span>
-          </p>
+          <p class="city-section-label">Dự báo 7 ngày tới</p>
           <div class="city-tabs" role="tablist">
             <button type="button" class="city-tab active" data-city="Hanoi">Hà Nội</button>
             <button type="button" class="city-tab" data-city="Ho Chi Minh City">TP.HCM</button>
@@ -428,10 +521,10 @@
 
       <main class="col col-trip">
         <h2>Lên kế hoạch chuyến đi</h2>
-        <p class="section-hint">Mô tả điểm đến, ngày đi, số người và ngân sách. Đặt vé &amp; phòng qua đối tác Zalopay.</p>
+        <p class="section-hint">Mô tả điểm đến, ngày đi, số người và ngân sách — AI sẽ gợi ý lịch trình.</p>
         <form class="trip-form" id="tripForm">
           <textarea id="tripInput" placeholder="VD: 10 người từ TP.HCM đi Đà Nẵng 20–23/3, 5 triệu/người. Thích biển và ẩm thực."></textarea>
-          <button type="submit" class="btn btn-blue" id="tripSubmitBtn">Lên lịch trình</button>
+          <button type="submit" class="btn btn-blue" id="tripSubmitBtn">Let's gooo</button>
         </form>
         <div class="trip-results" id="tripResults"></div>
       </main>
@@ -439,14 +532,18 @@
       <aside class="col col-bill" id="billPanel">
         <button type="button" class="bill-panel-header" id="billPanelToggle" aria-expanded="false">
           <div>
-            <div class="bill-panel-title">Chia hóa đơn</div>
-            <div class="bill-panel-sub" id="billSummary">Chạm để mở · Ví Zalopay</div>
+            <div class="bill-panel-title">Thủ quỹ</div>
+            <div class="bill-panel-sub" id="billSummary">Chạm để mở</div>
           </div>
           <svg class="bill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="bill-panel-body" id="billPanelBody"></div>
       </aside>
     </div>
+
+    <footer class="site-footer">
+      Powered by <strong>Zalopay</strong> services. And AI can make mistakes.
+    </footer>
   </div>
 
   <div class="receipt-modal-overlay" id="receiptModalOverlay" aria-hidden="true">
@@ -487,10 +584,17 @@
     let payableFilter = "";
     let recordedBills = [];
     let pendingUploadFile = null;
+    let tripContext = null;
+    let currentTripBrief = null;
+    let treasurerHost = { name: "", phone: "" };
+    let expenseInputMode = "manual";
+    let billSectionsOpen = { thuQuy: true, daChi: false, quyetToan: false };
+    const ZALOPAY_BANK_BIN = "971101";
 
     const config = window.AGENT_CONFIG || {};
     const zalopay = config.zalopay || {};
-    const useLiveAgents = Boolean(config.useLiveAgents && config.proxyBase);
+    const proxyBase = config.proxyBase ?? "";
+    const useLiveAgents = config.useLiveAgents !== false;
 
     function teamHeaders() {
       const teamId = localStorage.getItem("teamId") || config.teamId || "team-web-demo";
@@ -507,16 +611,24 @@
     async function apiPost(path, body, userId) {
       const headers = { ...teamHeaders() };
       if (userId) headers["X-GreenNode-AgentBase-User-Id"] = userId;
-      const res = await fetch(`${config.proxyBase}${path}`, {
+      const res = await fetch(`${proxyBase}${path}`, {
         method: "POST", headers, body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error(`Lỗi API ${res.status}`);
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => "");
+        throw new Error(`Lỗi API ${res.status}${errBody ? `: ${errBody.slice(0, 120)}` : ""}`);
+      }
       return res.json();
+    }
+
+    function roundVnd(n) {
+      if (n == null || Number.isNaN(n)) return 0;
+      return Math.round(Number(n) / 100) * 100;
     }
 
     function formatVnd(n) {
       if (n == null || Number.isNaN(n)) return "—";
-      return new Intl.NumberFormat("vi-VN").format(n) + " ₫";
+      return new Intl.NumberFormat("vi-VN").format(roundVnd(n)) + " ₫";
     }
 
     function stripDiacritics(text) {
@@ -538,10 +650,20 @@
       return teamMembers.some((m) => normalizeName(m.display_name) === key);
     }
 
-    /** Chuyển nội dung agent (markdown) thành HTML gọn, không hiển thị raw markdown */
+    /** Chuyển nội dung agent thành văn bản thuần tiếng Việt — không markdown */
     function beautifyAgentText(text) {
       if (!text || typeof text !== "string") return "<p>Đang cập nhật…</p>";
-      const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+      const cleaned = text
+        .replace(/^#{1,6}\s+/gm, "")
+        .replace(/\*\*([^*]+)\*\*/g, "$1")
+        .replace(/\*([^*]+)\*/g, "$1")
+        .replace(/__([^_]+)__/g, "$1")
+        .replace(/_([^_]+)_/g, "$1")
+        .replace(/`([^`]+)`/g, "$1");
+
+      const lines = cleaned.split("\n").map((l) => l.trim()).filter(Boolean)
+        .filter((line) => !/^⚠️\s*Cảnh báo thời tiết/i.test(line))
+        .filter((line) => !/^\d{4}-\d{2}-\d{2}:.*ưu tiên hoạt động trong nhà/i.test(line));
       const parts = [];
       let listItems = [];
 
@@ -553,16 +675,14 @@
       };
 
       for (const line of lines) {
-        if (/^#{1,3}\s+/.test(line)) {
+        if (/^[-*•]\s+/.test(line) || /^\d+\.\s+/.test(line)) {
+          listItems.push(line.replace(/^[-*•]\s+/, "").replace(/^\d+\.\s+/, ""));
+        } else if (/^[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u.test(line)) {
           flushList();
-          const title = line.replace(/^#{1,3}\s+/, "").replace(/\*\*/g, "");
-          parts.push(`<p><strong>${escapeHtml(title)}</strong></p>`);
-        } else if (/^[-*•]\s+/.test(line) || /^\d+\.\s+/.test(line)) {
-          listItems.push(line.replace(/^[-*•]\s+/, "").replace(/^\d+\.\s+/, "").replace(/\*\*/g, ""));
+          parts.push(`<p>${escapeHtml(line)}</p>`);
         } else {
           flushList();
-          const clean = line.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*/g, "");
-          parts.push(`<p>${clean}</p>`);
+          parts.push(`<p>${escapeHtml(line)}</p>`);
         }
       }
       flushList();
@@ -570,42 +690,94 @@
     }
 
     function escapeHtml(s) {
-      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      if (s == null) return "";
+      const str = typeof s === "string" ? s : String(s);
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    function buildPreTripServices(brief) {
-      const origin = brief.origin_city || "TP.HCM";
-      const dest = brief.destination_city || "Đà Nẵng";
-      return {
-        transport: [
-          { type: "Máy bay", provider: "Vietjet Air", price: 1890000, note: `${origin} → ${dest} · qua Zalopay`, color: "transport" },
-          { type: "Xe khách", provider: "Phương Trang FUTA", price: 450000, note: "Ghế ngồi · đặt trên Zalopay", color: "transport" },
-          { type: "Tàu hỏa", provider: "Đường sắt Việt Nam", price: 680000, note: "Toa cứng điều hòa", color: "transport" },
-        ],
-        stay: [
-          { type: "Khách sạn", provider: "Mường Thanh Đà Nẵng", price: 850000, note: "Phòng đôi/đêm · Zalopay", color: "stay" },
-          { type: "Nhà nghỉ", provider: "Homestay Hội An", price: 420000, note: "Gần phố cổ", color: "stay" },
-          { type: "Khách sạn", provider: "Novotel Premier", price: 1250000, note: "Bãi biển Mỹ Khê", color: "stay" },
-        ],
-      };
+    function formatActivityItem(item) {
+      if (item == null) return "";
+      if (typeof item === "string") return item;
+      if (typeof item === "object") {
+        const todLabels = { morning: "Sáng", afternoon: "Chiều", evening: "Tối", night: "Đêm" };
+        const prefix = item.timeOfDay ? `${todLabels[item.timeOfDay] || item.timeOfDay}: ` : "";
+        const name = item.name || item.title || "";
+        const desc = item.description ? ` — ${item.description}` : "";
+        return `${prefix}${name}${desc}`.trim();
+      }
+      return String(item);
     }
 
-    function renderServiceCards(services) {
-      const renderGroup = (items, title) => items.length ? `
-        <p style="margin:12px 0 6px;font-weight:700;font-size:0.82rem;color:var(--main-blue)">${title}</p>
-        <div class="service-grid">${items.map((s) => `
-          <div class="service-card ${s.color}">
-            <div>
-              <div class="service-type ${s.color}">${s.type}</div>
-              <div class="service-name">${s.provider}</div>
-              <div class="service-note">${s.note}</div>
-              <button type="button" class="service-action" onclick="alert('Sắp tích hợp API Zalopay')">Đặt qua Zalopay</button>
-            </div>
-            <div class="service-price">${formatVnd(s.price)}<div style="font-size:0.68rem;font-weight:400;color:var(--muted)">/người</div></div>
-          </div>`).join("")}</div>` : "";
+    function formatVndRange(min, max, unit) {
+      if (min === 0 && (max === 0 || max == null)) return `Miễn phí${unit || ""}`;
+      if (min == null && max == null) return "—";
+      if (min === max || max == null) return `~${formatVnd(min)}${unit || ""}`;
+      return `~${formatVnd(min)} – ${formatVnd(max)}${unit || ""}`;
+    }
 
-      return renderGroup(services.transport, "✈️ Di chuyển — đặt trước ngày 1")
-        + renderGroup(services.stay, "🏨 Lưu trú — đặt trước ngày 1");
+    const COLOR_BY_CATEGORY = {
+      flight: "transport", train: "transport", bus: "transport",
+      hotel: "stay", local: "local", activity: "activity",
+    };
+
+    function renderEstimateOption(opt) {
+      const color = COLOR_BY_CATEGORY[opt._category] || "transport";
+      if (opt.isQrSlot && opt.qrImage) {
+        return `
+          <div class="service-card ${color} zalopay-card qr-slot">
+            <span class="zalopay-badge">Zalopay</span>
+            <img src="${escapeHtml(opt.qrImage)}" alt="QR Zalopay" />
+            <div class="service-name">${escapeHtml(opt.name || "Quét mã Zalopay")}</div>
+            <div class="service-note">${escapeHtml(opt.note || "")}</div>
+          </div>`;
+      }
+      const cardClass = opt.isZalopay ? `service-card ${color} zalopay-card` : `service-card ${color}`;
+      const priceHtml = (opt.priceMin === 0 && opt.priceMax === 0)
+        ? ""
+        : `<div class="service-price"><div class="service-price-est">ước tính</div>${formatVndRange(opt.priceMin, opt.priceMax, opt.unit || "")}</div>`;
+      return `
+        <div class="${cardClass}">
+          <div>
+            ${opt.isZalopay ? '<span class="zalopay-badge">Zalopay</span>' : ""}
+            <div class="service-type ${color}">${escapeHtml(opt.type || "")}</div>
+            <div class="service-name">${escapeHtml(opt.name || opt.provider || "")}</div>
+            <div class="service-note">${escapeHtml(opt.note || "")}</div>
+            ${opt.url ? `<a class="service-action" href="${escapeHtml(opt.url)}" target="_blank" rel="noopener noreferrer">Xem &amp; đặt</a>` : ""}
+          </div>
+          ${priceHtml}
+        </div>`;
+    }
+
+    function renderEstimateCategories(categories) {
+      if (!categories?.length) return "<p style='color:var(--muted)'>Chưa có dữ liệu giá ước tính.</p>";
+      return categories.map((cat) => {
+        const options = (cat.options || []).map((o) => ({ ...o, _category: cat.id }));
+        const cards = options.map(renderEstimateOption).join("");
+        return `
+          <p style="margin:12px 0 6px;font-weight:700;font-size:0.82rem;color:var(--main-blue)">${escapeHtml(cat.title)}</p>
+          <div class="service-grid">${cards}</div>`;
+      }).join("");
+    }
+
+    function renderBudgetInline(budget) {
+      if (!budget?.rows?.length) return "";
+      return `
+        <div class="budget-inline">
+          <div class="budget-inline-title">Tổng ngân sách ước tính (AI)</div>
+          ${budget.rows.map((c) => `<div class="budget-row"><span>${escapeHtml(c.name)}</span><span>${formatVnd(c.perPerson)}</span></div>`).join("")}
+          <div class="budget-row total"><span>Tổng / người</span><span>${formatVnd(budget.perPerson)}</span></div>
+        </div>`;
+    }
+
+    async function fetchTripEstimates(data) {
+      try {
+        return await apiPost("/api/estimates", {
+          trip_brief: data.trip_brief || {},
+          budget_ledger: data.budget_ledger || {},
+        });
+      } catch (_) {
+        return { categories: [], budget: data.budget_ledger || {} };
+      }
     }
 
     function computeBillSummary(balances) {
@@ -619,7 +791,147 @@
 
     function updateBillSummary() {
       const el = document.getElementById("billSummary");
-      if (el && billData) el.textContent = computeBillSummary(billData.balances);
+      if (!el) return;
+      if (tripContext?.contributionPerMember > 0) {
+        el.textContent = `${computeBillSummary(billData?.balances)} · thu ${formatVnd(tripContext.contributionPerMember)}/người`;
+        return;
+      }
+      if (billData) el.textContent = computeBillSummary(billData.balances);
+    }
+
+    function buildTripId() {
+      const h = teamHeaders();
+      return `${h["X-GreenNode-AgentBase-Custom-Team-Id"]}:${h["X-GreenNode-AgentBase-Session-Id"]}`;
+    }
+
+    function computeContributionHalf(data) {
+      const plan = data?.plan?.overall?.budgetRange;
+      if (plan?.mid) return roundVnd(plan.mid / 2);
+      const ledger = data?.budget_ledger;
+      const perPerson = ledger?.total_per_person?.mid ?? ledger?.total_per_person_vnd;
+      if (perPerson) return roundVnd(perPerson / 2);
+      const brief = data?.trip_brief;
+      if (brief?.budget_vnd) return roundVnd(brief.budget_vnd / 2);
+      return 0;
+    }
+
+    function tripContextStorageKey() {
+      return `treasurerTripContext:${buildTripId()}`;
+    }
+
+    function emptyTripContext() {
+      return {
+        tripId: buildTripId(),
+        contributionPerMember: 0,
+        destination: null,
+        headcount: null,
+        dateRange: "",
+      };
+    }
+
+    function saveTripContext(ctx) {
+      tripContext = ctx;
+      try {
+        localStorage.removeItem("treasurerTripContext");
+        localStorage.setItem(tripContextStorageKey(), JSON.stringify(ctx));
+      } catch (_) { /* ignore */ }
+    }
+
+    function loadTripContext() {
+      if (tripContext) return tripContext;
+      try {
+        localStorage.removeItem("treasurerTripContext");
+        const raw = localStorage.getItem(tripContextStorageKey());
+        tripContext = raw ? JSON.parse(raw) : emptyTripContext();
+      } catch (_) {
+        tripContext = emptyTripContext();
+      }
+      return tripContext;
+    }
+
+    function saveTreasurerHost(host) {
+      treasurerHost = host;
+      try { localStorage.setItem("treasurerHost", JSON.stringify(host)); } catch (_) { /* ignore */ }
+    }
+
+    function loadTreasurerHost() {
+      if (treasurerHost.name || treasurerHost.phone) return treasurerHost;
+      try {
+        const raw = localStorage.getItem("treasurerHost");
+        if (raw) treasurerHost = JSON.parse(raw);
+      } catch (_) { /* ignore */ }
+      return treasurerHost;
+    }
+
+    async function linkTripToTreasurer(data) {
+      const tripId = buildTripId();
+      if (!data || data.phase !== "done") {
+        saveTripContext(emptyTripContext());
+        updateBillSummary();
+        if (billExpanded) renderBillPanelBody();
+        return;
+      }
+      const contribution = computeContributionHalf(data);
+      const brief = data.trip_brief || {};
+      const ctx = {
+        tripId,
+        contributionPerMember: contribution,
+        destination: brief.destination_city || data.plan?.overall?.destination,
+        headcount: brief.headcount || data.plan?.overall?.headcount,
+        dateRange: data.plan?.overall?.dateRangeLabel || "",
+      };
+      saveTripContext(ctx);
+      if (useLiveAgents) {
+        try {
+          await apiPost("/api/bill", {
+            action: "link_trip",
+            trip_id: tripId,
+            contribution_vnd_per_member: contribution,
+          }, teamMembers[0]?.member_id);
+        } catch (_) { /* keep local context */ }
+      }
+      updateBillSummary();
+      if (billExpanded) renderBillPanelBody();
+    }
+
+    function sanitizeTransferContent(text) {
+      return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^A-Za-z0-9 ]+/g, "").replace(/\s+/g, " ").trim().slice(0, 25) || "Trip thu quy";
+    }
+
+    function buildVietQrUrl({ bankBin, accountNo, accountName, amount, transferContent }) {
+      const bin = (bankBin || ZALOPAY_BANK_BIN).trim();
+      const acct = accountNo.trim();
+      const name = encodeURIComponent(accountName.trim());
+      const info = encodeURIComponent(sanitizeTransferContent(transferContent || "Trip thu quy"));
+      const base = `https://img.vietqr.io/image/${bin}-${acct}-compact2.png`;
+      return `${base}?amount=${Math.round(amount)}&addInfo=${info}&accountName=${name}`;
+    }
+
+    function renderCollapsibleSection(key, title, subtitle, bodyHtml) {
+      const open = billSectionsOpen[key];
+      return `
+        <div class="bill-section${open ? " open" : ""}" data-bill-section="${key}">
+          <button type="button" class="bill-section-toggle" aria-expanded="${open}">
+            <div>
+              <div class="bill-section-title">${title}</div>
+              ${subtitle ? `<div class="bill-section-sub">${subtitle}</div>` : ""}
+            </div>
+            <svg class="bill-section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="bill-section-body">${bodyHtml}</div>
+        </div>`;
+    }
+
+    function bindBillSections(root) {
+      root.querySelectorAll("[data-bill-section]").forEach((el) => {
+        el.querySelector(".bill-section-toggle").addEventListener("click", () => {
+          const key = el.dataset.billSection;
+          billSectionsOpen[key] = !billSectionsOpen[key];
+          el.classList.toggle("open", billSectionsOpen[key]);
+          el.querySelector(".bill-section-toggle").setAttribute("aria-expanded", billSectionsOpen[key]);
+        });
+      });
     }
 
     function weatherLabel(code) { return WEATHER_VI[code] || "Không xác định"; }
@@ -713,6 +1025,7 @@
       const reply = document.getElementById("weatherReply");
       const btn = document.getElementById("weatherSendBtn");
       btn.disabled = true;
+      reply.hidden = false;
       reply.classList.remove("empty");
       reply.textContent = "Đang tra cứu…";
       try {
@@ -721,7 +1034,7 @@
           reply.textContent = data.response || "Không có phản hồi.";
         } else {
           await new Promise((r) => setTimeout(r, 400));
-          reply.textContent = "Xem thanh trượt bên dưới để biết dự báo 7 ngày (dữ liệu Open-Meteo). Bật chế độ live để hỏi chatbot.";
+          reply.textContent = "Xem dự báo 7 ngày bên dưới nhé — bật chế độ live để hỏi chatbot chi tiết hơn.";
         }
       } catch (err) {
         reply.textContent = "Lỗi: " + err.message;
@@ -732,7 +1045,7 @@
 
     const MOCK_TRIP = {
       phase: "done",
-      response: "Chuyến đi Đà Nẵng cho 10 người, 20–23/3.\n\n**Gợi ý:** Đặt vé máy bay và khách sạn qua Zalopay trước ngày khởi hành.\n- Ngày 1: Nhận phòng, tắm biển Mỹ Khê\n- Ngày 2: Ngũ Hành Sơn, phố cổ Hội An",
+      response: "Chuyến đi Đà Nẵng cho 10 người, 20–23/3.\n\n- Ngày 1: Nhận phòng, tắm biển Mỹ Khê\n- Ngày 2: Ngũ Hành Sơn, phố cổ Hội An",
       trip_brief: { destination_city: "Đà Nẵng", origin_city: "TP.HCM", start_date: "2026-03-20", end_date: "2026-03-23", headcount: 10, budget_vnd: 5000000, budget_mode: "per_person", preferences: ["biển", "ẩm thực"] },
       itinerary: { days: [
         { day: 1, title: "Đến nơi & biển Mỹ Khê", activities: ["Nhận phòng khách sạn", "Dạo biển hoàng hôn", "Hải sản bãi biển"] },
@@ -742,16 +1055,189 @@
       budget_ledger: { categories: { stay: { mid: 1800000 }, transport: { mid: 1200000 }, activities: { mid: 1500000 } }, total_per_person: { mid: 4500000 }, total_group: { mid: 45000000 }, headcount: 10 },
     };
 
-    function normalizeItinerary(itinerary) {
-      if (!itinerary) return [];
-      const days = Array.isArray(itinerary) ? itinerary : (itinerary.days || []);
-      return days.map((d) => ({
-        day: d.day,
-        title: d.title || d.weather || `Ngày ${d.day}`,
-        items: d.items || d.activities || [],
-        note: d.note,
-        date: d.date,
-      }));
+    const VN_ORIGIN_ALIASES = {
+      "ho chi minh": "Ho Chi Minh City",
+      "tp ho chi minh": "Ho Chi Minh City",
+      "tp.hcm": "Ho Chi Minh City",
+      "hcm": "Ho Chi Minh City",
+      "saigon": "Ho Chi Minh City",
+      "ha noi": "Hanoi",
+      "hanoi": "Hanoi",
+      "da nang": "Da Nang",
+      "danang": "Da Nang",
+      "nha trang": "Nha Trang",
+      "phu quoc": "Phu Quoc",
+      "hue": "Hue",
+      "hoi an": "Hoi An",
+      "can tho": "Can Tho",
+      "hai phong": "Hai Phong",
+    };
+
+    const CITY_DISPLAY_VI = {
+      "Ho Chi Minh City": "TP.HCM",
+      "Hanoi": "Hà Nội",
+      "Da Nang": "Đà Nẵng",
+      "Nha Trang": "Nha Trang",
+      "Phu Quoc": "Phú Quốc",
+      "Hue": "Huế",
+      "Hoi An": "Hội An",
+      "Can Tho": "Cần Thơ",
+      "Hai Phong": "Hải Phòng",
+    };
+
+    function normalizeOriginCity(raw) {
+      if (!raw) return "";
+      const key = raw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      for (const [pattern, name] of Object.entries(VN_ORIGIN_ALIASES)) {
+        if (key.includes(pattern)) return name;
+      }
+      return raw.trim();
+    }
+
+    function tripInputHasDeparture(text) {
+      if (!text || typeof text !== "string") return false;
+      const lower = text.toLowerCase();
+      if (/\b(từ|khởi hành từ|from)\s+\S/i.test(lower)) return true;
+      const normalized = lower.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      for (const pattern of Object.keys(VN_ORIGIN_ALIASES)) {
+        const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        if (new RegExp(`\\b${escaped}\\s+(di|to)\\s+`, "i").test(normalized)) return true;
+      }
+      return false;
+    }
+
+    function injectDepartureIntoPrompt(text, cityLabel) {
+      const trimmed = (text || "").trim();
+      if (!trimmed) return `Từ ${cityLabel}`;
+      if (tripInputHasDeparture(trimmed)) return trimmed;
+      const headcountMatch = trimmed.match(/^(\d+\s*người\s*)(đi\s+)/i);
+      if (headcountMatch) {
+        return trimmed.replace(headcountMatch[0], `${headcountMatch[1]}từ ${cityLabel} ${headcountMatch[2]}`);
+      }
+      return `Từ ${cityLabel}. ${trimmed}`;
+    }
+
+    function removeLocationPrompt() {
+      document.getElementById("locationPrompt")?.remove();
+      document.getElementById("locationAllowBtn")?.remove();
+      document.getElementById("locationDenyBtn")?.remove();
+    }
+
+    async function reverseGeocodeMeteoCity(lat, lon) {
+      const url = new URL("https://geocoding-api.open-meteo.com/v1/reverse");
+      url.searchParams.set("latitude", String(lat));
+      url.searchParams.set("longitude", String(lon));
+      url.searchParams.set("language", "vi");
+      url.searchParams.set("count", "1");
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Không tra cứu được vị trí.");
+      const results = (await res.json()).results || [];
+      const loc = results[0];
+      if (!loc) throw new Error("Không xác định được thành phố/tỉnh.");
+      const canonical = normalizeOriginCity(loc.name || loc.admin1 || loc.admin2 || "");
+      const display = CITY_DISPLAY_VI[canonical] || loc.name || canonical;
+      if (!canonical && !display) throw new Error("Không xác định được thành phố/tỉnh.");
+      return { canonical: canonical || display, display: display || canonical };
+    }
+
+    function requestBrowserLocation() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("Trình duyệt không hỗ trợ định vị."));
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(resolve, (err) => {
+          const msg = err.code === 1
+            ? "PERMISSION_DENIED"
+            : (err.message || "Không lấy được vị trí.");
+          reject(new Error(msg));
+        }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 120000 });
+      });
+    }
+
+    async function submitTripRequest(message, extra = {}) {
+      const payload = { message, ...extra };
+      const mergedBrief = { ...(currentTripBrief || {}), ...(extra.trip_brief || {}) };
+      if (Object.keys(mergedBrief).length) payload.trip_brief = mergedBrief;
+      return apiPost("/api/trip", payload);
+    }
+
+    function bindLocationPromptButtons() {
+      const allowBtn = document.getElementById("locationAllowBtn");
+      const denyBtn = document.getElementById("locationDenyBtn");
+      if (!allowBtn || !denyBtn) return;
+
+      allowBtn.addEventListener("click", async () => {
+        const status = document.getElementById("locationStatus");
+        removeLocationPrompt();
+        allowBtn.disabled = true;
+        denyBtn.disabled = true;
+        if (status) {
+          status.className = "location-status";
+          status.textContent = "Đang lấy vị trí…";
+        }
+        try {
+          const pos = await requestBrowserLocation();
+          if (status) status.textContent = "Đang xác định thành phố…";
+          const { display } = await reverseGeocodeMeteoCity(pos.coords.latitude, pos.coords.longitude);
+          const input = document.getElementById("tripInput");
+          input.value = injectDepartureIntoPrompt(input.value.trim(), display);
+          if (status) status.textContent = `Đã điền: từ ${display}. Đang lên kế hoạch…`;
+          await runTripPlanning(input.value.trim());
+        } catch (err) {
+          if (status) {
+            status.className = "location-status error";
+            status.textContent = err.message === "PERMISSION_DENIED"
+              ? "Bạn đã từ chối quyền vị trí. Vui lòng nhập thành phố khởi hành trong ô nhập."
+              : err.message;
+          }
+        }
+      }, { once: true });
+
+      denyBtn.addEventListener("click", () => {
+        removeLocationPrompt();
+        const container = document.getElementById("tripResults");
+        const status = document.getElementById("locationStatus");
+        if (status) {
+          status.className = "location-status error";
+          status.textContent = "Vui lòng nhập điểm khởi hành (vd: từ TP.HCM) vào ô mô tả chuyến đi, rồi bấm Let's gooo.";
+        } else if (container) {
+          container.innerHTML += `<p class="location-status error">Vui lòng nhập điểm khởi hành (vd: từ TP.HCM) vào ô mô tả chuyến đi, rồi bấm Let's gooo.</p>`;
+        }
+      }, { once: true });
+    }
+
+    function shouldShowLocationPrompt(data) {
+      const inputText = document.getElementById("tripInput")?.value || "";
+      return data.intake_field === "origin_city"
+        && data.location_prompt
+        && !tripInputHasDeparture(inputText);
+    }
+
+    function renderIntakeMessage(data) {
+      const container = document.getElementById("tripResults");
+      let html = `<p>${escapeHtml(data.response || "Cần thêm thông tin.")}</p>`;
+      if (shouldShowLocationPrompt(data)) {
+        html += `
+          <div class="location-prompt" id="locationPrompt">
+            <button type="button" class="btn btn-green btn-sm" id="locationAllowBtn">📍 Cho phép vị trí</button>
+            <button type="button" class="btn btn-outline btn-sm" id="locationDenyBtn">Không, tôi sẽ nhập thủ công</button>
+          </div>
+          <div class="location-status" id="locationStatus"></div>`;
+      }
+      container.innerHTML = html;
+      container.classList.add("visible");
+      bindLocationPromptButtons();
+    }
+
+    async function handleTripResponse(data) {
+      if (data?.trip_brief) currentTripBrief = data.trip_brief;
+      if (data.phase === "done") {
+        await renderTripResults(data);
+      } else {
+        await linkTripToTreasurer(data);
+        renderIntakeMessage(data);
+      }
     }
 
     function normalizeBudget(ledger, headcount) {
@@ -784,14 +1270,13 @@
       });
     }
 
-    function renderTripResults(data) {
+    async function renderTripResults(data) {
       const brief = data.trip_brief || {};
       const container = document.getElementById("tripResults");
       const dates = brief.start_date && brief.end_date
         ? `${brief.start_date} → ${brief.end_date}` : "Chưa rõ ngày";
-      const days = normalizeItinerary(data.itinerary);
       const budget = normalizeBudget(data.budget_ledger, brief.headcount);
-      const services = buildPreTripServices(brief);
+      const estimatePayload = await fetchTripEstimates(data);
 
       container.innerHTML = `
         <div class="card-block open" data-card>
@@ -805,79 +1290,59 @@
           <div class="card-block-body">${beautifyAgentText(data.response)}</div>
         </div>
 
-        <div class="prep-banner">
-          <h3>📋 Chuẩn bị trước ngày 1 — qua Zalopay</h3>
-          <p>Trước khi bắt đầu lịch trình, team cần đặt phương tiện di chuyển và chỗ ở. Giá tham khảo (mock), API thật sẽ tích hợp sau.</p>
-        </div>
         <div class="card-block open" data-card>
           <button type="button" class="card-block-header" aria-expanded="true">
             <div>
-              <div class="card-title">Dịch vụ Zalopay</div>
-              <div class="card-sub">Vé máy bay · xe · tàu · khách sạn · nhà nghỉ</div>
-            </div>
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div class="card-block-body">${renderServiceCards(services)}</div>
-        </div>
-
-        <div class="card-block" data-card>
-          <button type="button" class="card-block-header" aria-expanded="false">
-            <div>
-              <div class="card-title">Lịch trình từng ngày</div>
-              <div class="card-sub">${days.length} ngày · bắt đầu sau khi đã đặt vé &amp; phòng</div>
+              <div class="card-title">Chi phí ước tính theo từng hạng mục</div>
+              <div class="card-sub">${brief.destination_city || "—"} · Zalopay + thương hiệu phổ biến</div>
             </div>
             <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="card-block-body">
-            ${days.length ? days.map((d) => `
-              <div class="day-plan">
-                <div class="day-plan-head">Ngày ${d.day}${d.date ? ` · ${d.date}` : ""}: ${d.title}</div>
-                ${d.note ? `<p style="margin:0 0 6px;font-size:0.78rem;color:var(--muted)">${d.note}</p>` : ""}
-                <ul>${(d.items || []).map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>
-              </div>`).join("") : "<p style='color:var(--muted)'>Chưa có lịch trình.</p>"}
-          </div>
-        </div>
-
-        <div class="card-block" data-card>
-          <button type="button" class="card-block-header" aria-expanded="false">
-            <div>
-              <div class="card-title">Ngân sách ước tính</div>
-              <div class="card-sub">${formatVnd(budget.perPerson)}/người</div>
-            </div>
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div class="card-block-body">
-            ${budget.rows.map((c) => `<div class="budget-row"><span>${c.name}</span><span>${formatVnd(c.perPerson)}</span></div>`).join("")}
-            <div class="budget-row total"><span>Tổng / người</span><span>${formatVnd(budget.perPerson)}</span></div>
+            ${renderEstimateCategories(estimatePayload.categories)}
+            ${renderBudgetInline(budget)}
           </div>
         </div>`;
 
       container.classList.add("visible");
       bindCardBlocks(container);
+      await linkTripToTreasurer(data);
     }
 
-    document.getElementById("tripForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const msg = document.getElementById("tripInput").value.trim();
-      if (!msg) return;
+    async function runTripPlanning(msg) {
       const btn = document.getElementById("tripSubmitBtn");
       btn.disabled = true;
       btn.textContent = "Đang lên kế hoạch…";
       try {
         let data;
         if (useLiveAgents) {
-          data = await apiPost("/api/trip", { message: msg });
+          data = await submitTripRequest(msg);
         } else {
           await new Promise((r) => setTimeout(r, 900));
           data = { ...MOCK_TRIP, response: MOCK_TRIP.response + `\n\n(Yêu cầu: "${msg.slice(0, 70)}…")` };
+          if (data.trip_brief) currentTripBrief = data.trip_brief;
         }
-        renderTripResults(data);
+        await handleTripResponse(data);
       } catch (err) {
-        document.getElementById("tripResults").innerHTML = `<p style="color:var(--sub-pink)">${err.message}</p>`;
+        document.getElementById("tripResults").innerHTML = `<p style="color:var(--sub-pink)">${escapeHtml(err.message)}</p>`;
         document.getElementById("tripResults").classList.add("visible");
       } finally {
         btn.disabled = false;
-        btn.textContent = "Lên lịch trình";
+        btn.textContent = "Let's gooo";
+      }
+    }
+
+    document.getElementById("tripForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("tripInput").value.trim();
+      if (!msg) return;
+      removeLocationPrompt();
+      await runTripPlanning(msg);
+    });
+
+    document.getElementById("tripInput").addEventListener("input", () => {
+      if (tripInputHasDeparture(document.getElementById("tripInput").value)) {
+        removeLocationPrompt();
       }
     });
 
@@ -1034,32 +1499,61 @@
     function renderBillPanelBody() {
       const body = document.getElementById("billPanelBody");
       const data = billData || MOCK_BILL;
-      const expenseCount = data.expenses.length;
       syncRecordedFromExpenses();
+      loadTripContext();
+      loadTreasurerHost();
+
+      const ctx = tripContext;
+      const contrib = ctx?.contributionPerMember || 0;
+      const host = treasurerHost;
+      const hostQrUrl = (host.phone && contrib > 0)
+        ? buildVietQrUrl({
+            bankBin: ZALOPAY_BANK_BIN,
+            accountNo: host.phone,
+            accountName: host.phone,
+            amount: contrib,
+            transferContent: `Thu quy ${ctx?.destination || "trip"}`,
+          })
+        : null;
 
       const memberOptions = teamMembers.length
         ? teamMembers.map((m) => `<option value="${m.member_id}">${escapeHtml(m.display_name)}</option>`).join("")
         : Object.entries(data.balances).map(([id, b]) => `<option value="${id}">${escapeHtml(b.display_name)}</option>`).join("");
 
-      body.innerHTML = `
-        <div class="bill-section">
-          <div class="bill-section-title"><span class="bill-section-num">1</span> Thêm thành viên nhóm</div>
-          <form class="member-form" id="memberForm">
-            <input type="text" id="memberName" placeholder="Tên hiển thị (VD: An)" required maxlength="40" />
-            <input type="tel" id="memberPhone" placeholder="Số điện thoại Zalopay (VD: 0901234567)" required />
-            <div class="form-error" id="memberError">Tên đã tồn tại trong nhóm.</div>
-            <button type="submit" class="btn btn-blue btn-sm btn-block">Thêm vào nhóm</button>
-          </form>
-          <div class="member-tags" id="memberTags">${teamMembers.map((m) => `<span class="member-tag">${escapeHtml(m.display_name)}</span>`).join("")}</div>
-        </div>
+      const thuQuyHtml = `
+        ${ctx?.tripId ? `<span class="trip-link-badge">🔗 Trip ${escapeHtml(ctx.tripId)}</span>` : `<p style="font-size:0.76rem;color:var(--muted);margin:0 0 8px">Lên kế hoạch chuyến đi trước để liên kết ngân sách.</p>`}
+        ${contrib > 0 ? `
+          <div class="contrib-highlight">
+            Mỗi thành viên đóng góp ban đầu (½ ngân sách ước tính):
+            <strong>${formatVnd(contrib)}</strong>
+            ${ctx?.headcount ? `<span style="color:var(--muted)"> · ${ctx.headcount} người · tổng ${formatVnd(contrib * ctx.headcount)}</span>` : ""}
+          </div>` : ""}
+        <form class="member-form" id="hostForm">
+          <input type="text" id="hostName" placeholder="Tên thủ quỹ (VD: An)" value="${escapeHtml(host.name)}" required maxlength="40" />
+          <input type="tel" id="hostPhone" placeholder="SĐT Zalopay nhận tiền (VD: 0901234567)" value="${escapeHtml(host.phone)}" required />
+          <button type="submit" class="btn btn-blue btn-sm btn-block">Tạo mã QR thu quỹ</button>
+        </form>
+        ${hostQrUrl ? `
+          <div class="qr-block" id="treasuryQrBlock">
+            <img src="${hostQrUrl}" alt="VietQR thu quỹ" />
+            <div><strong>${escapeHtml(host.name || "Thủ quỹ")}</strong></div>
+            <div style="font-size:0.72rem;color:var(--muted)">${escapeHtml(host.phone)} · Zalopay</div>
+            <div style="color:var(--main-green);font-weight:700;margin-top:4px">${formatVnd(contrib)}/người</div>
+            <p style="font-size:0.72rem;color:var(--muted);margin:8px 0 0">Thành viên quét mã để chuyển tiền thu quỹ ban đầu.</p>
+          </div>` : ""}`;
 
-        <div class="bill-section">
-          <div class="bill-section-title"><span class="bill-section-num">2</span> Tải hóa đơn &amp; chứng từ</div>
-          <p style="margin:0 0 10px;font-size:0.76rem;color:var(--muted)">Ảnh chuyển khoản, biên lai tiền mặt hoặc screenshot bill để ghi nhận chi phí.</p>
-          <form class="receipt-upload-form" id="receiptUploadForm">
-            <select id="receiptPayer" required>${memberOptions || '<option value="">— Thêm thành viên trước —</option>'}</select>
-            <input type="text" id="receiptMerchant" placeholder="Tên cửa hàng / mô tả" required />
-            <input type="number" id="receiptAmount" placeholder="Số tiền (VND)" min="1000" step="1000" required />
+      const daChiHtml = `
+        <div class="input-mode-tabs">
+          <button type="button" class="input-mode-tab${expenseInputMode === "manual" ? " active" : ""}" data-mode="manual">✏️ Nhập tay</button>
+          <button type="button" class="input-mode-tab${expenseInputMode === "ocr" ? " active" : ""}" data-mode="ocr">📷 Chụp / OCR</button>
+        </div>
+        <form class="receipt-upload-form${expenseInputMode === "ocr" ? " ocr-mode" : ""}" id="receiptUploadForm">
+          <select id="receiptPayer" required>
+            ${memberOptions || '<option value="">— Thêm thành viên ở Quyết toán —</option>'}
+          </select>
+          <div class="manual-only-fields">
+            <input type="text" id="receiptMerchant" placeholder="Mô tả / tên cửa hàng" />
+            <input type="number" id="receiptAmount" placeholder="Số tiền (VND)" min="1000" step="1000" />
             <select id="receiptCategory">
               <option value="food">Ăn uống</option>
               <option value="transport">Di chuyển</option>
@@ -1067,33 +1561,32 @@
               <option value="activity">Hoạt động</option>
               <option value="other">Khác</option>
             </select>
-            <label class="upload-zone" id="uploadZone">
-              <input type="file" id="receiptFile" accept="image/jpeg,image/png,image/webp" />
-              <div class="upload-zone-text" id="uploadZoneText">
-                <strong>Chạm để tải ảnh chứng từ</strong>
-                JPG, PNG, WebP · tối đa ~4 MB
-              </div>
-            </label>
-            <button type="submit" class="btn btn-green btn-sm btn-block">Thêm hóa đơn</button>
-          </form>
-          ${renderReceiptSliderHtml()}
-        </div>
-
-        <div class="bill-section">
-          <div class="bill-section-title"><span class="bill-section-num">3</span> Xác nhận hóa đơn</div>
-          <div class="confirm-status${billsConfirmed ? " done" : ""}" id="confirmStatus">
-            ${billsConfirmed
-              ? `✓ Đã xác nhận ${expenseCount} hóa đơn — sẵn sàng quyết toán`
-              : `Hiện có ${expenseCount} hóa đơn. Xác nhận khi đã nhập đủ chi phí chuyến đi.`}
           </div>
-          <button type="button" class="btn btn-green btn-block" id="confirmBillsBtn" ${billsConfirmed ? "disabled" : ""}>
-            ${billsConfirmed ? "Đã xác nhận đủ" : "Xác nhận đủ hóa đơn"}
+          <label class="upload-zone${pendingUploadFile ? " has-file" : ""}" id="uploadZone">
+            <input type="file" id="receiptFile" accept="image/jpeg,image/png,image/webp" />
+            <div class="upload-zone-text" id="uploadZoneText">
+              ${expenseInputMode === "ocr"
+                ? "<strong>Chụp / tải ảnh hóa đơn</strong> AI đọc mô tả &amp; loại chi phí"
+                : "<strong>Chạm để đính kèm ảnh (tuỳ chọn)</strong> JPG, PNG, WebP"}
+            </div>
+          </label>
+          <button type="submit" class="btn btn-green btn-sm btn-block">
+            ${expenseInputMode === "ocr" ? "Quét &amp; ghi nhận chi phí" : "Ghi nhận chi phí"}
           </button>
-        </div>
+        </form>
+        ${renderReceiptSliderHtml()}`;
 
-        <div class="bill-section">
-          <div class="bill-section-title"><span class="bill-section-num">4</span> Số tiền cần trả</div>
-          <input type="text" class="filter-input" id="payableFilter" placeholder="Lọc theo tên thành viên…" value="${escapeHtml(payableFilter)}" />
+      const quyetToanHtml = `
+        <form class="member-form" id="memberForm">
+          <input type="text" id="memberName" placeholder="Tên thành viên (VD: Bình)" required maxlength="40" />
+          <input type="tel" id="memberPhone" placeholder="SĐT Zalopay (VD: 0902345678)" required />
+          <div class="form-error" id="memberError">Tên đã tồn tại trong nhóm.</div>
+          <button type="submit" class="btn btn-blue btn-sm btn-block">Thêm thành viên</button>
+        </form>
+        <div class="member-tags" id="memberTags">${teamMembers.map((m) => `<span class="member-tag">${escapeHtml(m.display_name)} · ${escapeHtml(m.phone || m.member_id)}</span>`).join("")}</div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--border)">
+          <div class="bill-section-title" style="margin-bottom:8px">Số dư &amp; quyết toán</div>
+          <input type="text" class="filter-input" id="payableFilter" placeholder="Lọc theo tên…" value="${escapeHtml(payableFilter)}" />
           <div id="payableList">
             ${Object.entries(data.balances).map(([id, b]) => {
               const net = b.net_vnd ?? b.net ?? 0;
@@ -1109,13 +1602,35 @@
               </div>`;
             }).join("")}
           </div>
-        </div>
+          <button type="button" class="btn btn-blue btn-block" id="settleBtn"
+            ${billSettled || !teamMembers.length ? "disabled" : ""} style="margin-top:10px">
+            ${billSettled ? "Đã quyết toán" : "Tạo mã QR quyết toán Zalopay"}
+          </button>
+          <div id="qrSection"></div>
+        </div>`;
 
-        <button type="button" class="btn btn-blue btn-block" id="settleBtn"
-          ${!billsConfirmed || billSettled ? "disabled" : ""} style="margin-top:4px">
-          ${billSettled ? "Đã quyết toán" : "Quyết toán qua Zalopay"}
-        </button>
-        <div id="qrSection"></div>`;
+      body.innerHTML =
+        renderCollapsibleSection("thuQuy", "💰 Thu quỹ", contrib ? `${formatVnd(contrib)}/người · ½ ngân sách` : "Liên kết chuyến đi", thuQuyHtml)
+        + renderCollapsibleSection("daChi", "🧾 Đã chi", `${recordedBills.length} khoản chi`, daChiHtml)
+        + renderCollapsibleSection("quyetToan", "⚖️ Quyết toán", computeBillSummary(data.balances), quyetToanHtml);
+
+      bindBillSections(body);
+
+      document.getElementById("hostForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("hostName").value.trim();
+        const phone = normalizePhone(document.getElementById("hostPhone").value);
+        if (!name || phone.length < 10) return;
+        saveTreasurerHost({ name, phone });
+        renderBillPanelBody();
+      });
+
+      document.querySelectorAll(".input-mode-tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          expenseInputMode = tab.dataset.mode;
+          renderBillPanelBody();
+        });
+      });
 
       document.getElementById("memberForm").addEventListener("submit", onAddMember);
 
@@ -1125,46 +1640,44 @@
         pendingUploadFile = fileInput.files[0] || null;
         uploadZone.classList.toggle("has-file", !!pendingUploadFile);
         document.getElementById("uploadZoneText").innerHTML = pendingUploadFile
-          ? `<strong>✓ ${escapeHtml(pendingUploadFile.name)}</strong> Sẵn sàng tải lên`
-          : `<strong>Chạm để tải ảnh chứng từ</strong> JPG, PNG, WebP · tối đa ~4 MB`;
+          ? `<strong>✓ ${escapeHtml(pendingUploadFile.name)}</strong> Sẵn sàng`
+          : (expenseInputMode === "ocr"
+            ? "<strong>Chụp / tải ảnh hóa đơn</strong> AI đọc mô tả &amp; loại chi phí"
+            : "<strong>Chạm để đính kèm ảnh (tuỳ chọn)</strong> JPG, PNG, WebP");
       });
 
       document.getElementById("receiptUploadForm").addEventListener("submit", onUploadReceipt);
 
-      document.getElementById("confirmBillsBtn").addEventListener("click", async () => {
-        if (data.expenses.length === 0) {
-          alert("Chưa có hóa đơn nào. Tải chứng từ trước khi xác nhận.");
-          return;
-        }
-        if (useLiveAgents) {
-          try {
-            await apiPost("/api/bill", { action: "confirm_bills" }, teamMembers[0]?.member_id);
-            billsConfirmed = true;
-            await refreshBillData();
-          } catch (err) {
-            alert("Lỗi xác nhận: " + err.message);
-            return;
-          }
-        } else {
-          billsConfirmed = true;
-          renderBillPanelBody();
-        }
-      });
-      document.getElementById("payableFilter").addEventListener("input", (e) => {
+      document.getElementById("payableFilter")?.addEventListener("input", (e) => {
         payableFilter = e.target.value;
         renderPayableList();
       });
-      document.getElementById("settleBtn").addEventListener("click", handleSettle);
+      document.getElementById("settleBtn")?.addEventListener("click", handleSettle);
       bindReceiptSlider();
     }
 
     async function onUploadReceipt(e) {
       e.preventDefault();
       const payerId = document.getElementById("receiptPayer").value;
-      const merchant = document.getElementById("receiptMerchant").value.trim();
-      const amount = parseInt(document.getElementById("receiptAmount").value, 10);
-      const category = document.getElementById("receiptCategory").value;
-      if (!payerId || !merchant || !amount || amount < 1000) return;
+      if (!payerId) {
+        alert("Chọn người chi hoặc thêm thành viên ở mục Quyết toán.");
+        return;
+      }
+
+      const isOcr = expenseInputMode === "ocr";
+      const merchantEl = document.getElementById("receiptMerchant");
+      const amountEl = document.getElementById("receiptAmount");
+      const categoryEl = document.getElementById("receiptCategory");
+
+      let merchant = merchantEl?.value?.trim() || "";
+      let amount = amountEl?.value ? parseInt(amountEl.value, 10) : 0;
+      let category = categoryEl?.value || "other";
+
+      if (isOcr && !pendingUploadFile) {
+        alert("Chụp hoặc tải ảnh hóa đơn để quét OCR.");
+        return;
+      }
+      if (!isOcr && (!merchant || !amount || amount < 1000)) return;
 
       const payerMember = teamMembers.find((m) => m.member_id === payerId);
       const payerName = payerMember?.display_name
@@ -1194,28 +1707,29 @@
             image_base64: imageBase64,
             image_media_type: mediaType,
             payer_id: payerId,
-            category,
-            merchant,
-            total_vnd: amount,
+            category: isOcr ? undefined : category,
+            merchant: isOcr ? undefined : merchant,
+            total_vnd: isOcr ? undefined : amount,
             member_ids: splitAmong,
-            notes: pendingUploadFile ? "Có ảnh chứng từ" : "",
-            message: `${merchant} ${amount}`,
+            notes: isOcr ? "OCR từ ảnh" : (pendingUploadFile ? "Có ảnh chứng từ" : ""),
+            message: isOcr ? "OCR receipt" : `${merchant} ${amount}`,
           }, payerId);
-          if (result.needs_confirm && result.expense) {
+          const exp = result.expense || {};
+          if (result.needs_confirm && exp.expense_id) {
             await apiPost("/api/bill", {
               action: "confirm_expense",
-              expense_id: result.expense.expense_id,
-              total_vnd: amount,
-              merchant,
+              expense_id: exp.expense_id,
+              total_vnd: exp.total_vnd || amount,
+              merchant: exp.merchant || merchant,
               payer_id: payerId,
-              category,
+              category: exp.category || category,
             }, payerId);
           }
           await refreshBillData();
           recordedBills = [];
           syncRecordedFromExpenses();
         } catch (err) {
-          alert("Lỗi tải hóa đơn: " + err.message);
+          alert("Lỗi ghi nhận chi phí: " + err.message);
           return;
         }
       } else if (useLiveAgents && !imageBase64) {
@@ -1290,10 +1804,10 @@
             action: "register_member",
             member_id: memberId,
             display_name: name,
-            bank_bin: zalopay.bankBin,
+            bank_bin: ZALOPAY_BANK_BIN,
             bank_code: zalopay.bankCode || "ZLP",
             account_no: phone,
-            account_name: stripDiacritics(name),
+            account_name: phone,
           }, memberId);
           await refreshBillData();
         } catch (err) {
@@ -1313,26 +1827,52 @@
     }
 
     async function handleSettle() {
-      if (!billsConfirmed) return;
+      if (!teamMembers.length) return;
       const btn = document.getElementById("settleBtn");
       btn.disabled = true;
       btn.textContent = "Đang quyết toán…";
       let transfers = billData?.transfers || MOCK_BILL.transfers;
       try {
         if (useLiveAgents) {
-          const result = await apiPost("/api/bill", { action: "finalize" }, teamMembers[0]?.member_id || "alice");
+          if (!billsConfirmed && (billData?.expenses?.length || recordedBills.length)) {
+            await apiPost("/api/bill", { action: "confirm_bills" }, teamMembers[0]?.member_id);
+            billsConfirmed = true;
+          }
+          const result = await apiPost("/api/bill", { action: "finalize", format: "url" }, teamMembers[0]?.member_id || "alice");
           transfers = result.transfers || [];
           billSettled = true;
         } else {
+          if (!billsConfirmed && recordedBills.length) billsConfirmed = true;
           await new Promise((r) => setTimeout(r, 600));
           billSettled = true;
+          transfers = (billData?.transfers || MOCK_BILL.transfers).map((t) => {
+            const toMember = teamMembers.find((m) => m.display_name === (t.to || t.to_display_name))
+              || teamMembers[0];
+            const fromMember = teamMembers.find((m) => m.display_name === (t.from || t.from_display_name))
+              || teamMembers[1];
+            const phone = toMember?.phone || "0901234567";
+            return {
+              ...t,
+              from_display_name: t.from || t.from_display_name,
+              to_display_name: t.to || t.to_display_name,
+              amount_vnd: t.amount_vnd,
+              vietqr_url: buildVietQrUrl({
+                bankBin: ZALOPAY_BANK_BIN,
+                accountNo: phone,
+                accountName: phone,
+                amount: t.amount_vnd,
+                transferContent: `Settle ${t.from || t.from_display_name}`,
+              }),
+            };
+          });
         }
-        document.getElementById("qrSection").innerHTML = transfers.map((t) => `
+        document.getElementById("qrSection").innerHTML = transfers.length ? transfers.map((t) => `
           <div class="qr-block">
-            ${t.vietqr_url ? `<img src="${t.vietqr_url}" alt="VietQR" />` : `<div class="qr-placeholder">Mã Zalopay</div>`}
-            <div><strong>${t.from_display_name || t.from || t.from_member}</strong> → <strong>${t.to_display_name || t.to || t.to_member}</strong></div>
+            ${t.vietqr_url ? `<img src="${t.vietqr_url}" alt="VietQR Zalopay" />` : `<div class="qr-placeholder">Mã Zalopay</div>`}
+            <div><strong>${escapeHtml(t.from_display_name || t.from || t.from_member)}</strong> → <strong>${escapeHtml(t.to_display_name || t.to || t.to_member)}</strong></div>
             <div style="color:var(--main-green);font-weight:700;margin-top:4px">${formatVnd(t.amount_vnd)}</div>
-          </div>`).join("");
+            <p style="font-size:0.68rem;color:var(--muted);margin:6px 0 0">Quét bằng Zalopay hoặc app ngân hàng</p>
+          </div>`).join("") : `<p style="font-size:0.78rem;color:var(--muted);margin-top:8px">Không cần chuyển thêm — số dư đã cân.</p>`;
         btn.textContent = "Đã quyết toán";
       } catch (err) {
         btn.textContent = "Thử lại";
@@ -1384,6 +1924,9 @@
     document.getElementById("billPanelToggle").addEventListener("click", toggleBillPanel);
 
     async function initBill() {
+      tripContext = null;
+      loadTripContext();
+      loadTreasurerHost();
       billData = {
         balances: { ...MOCK_BILL.balances },
         expenses: [...MOCK_BILL.expenses],

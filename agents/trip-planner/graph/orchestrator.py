@@ -24,7 +24,12 @@ def build_graph(llm):
     graph_builder.add_node("itinerary", lambda s: itinerary_node(s, llm))
     graph_builder.add_node(
         "end_intake",
-        lambda s: {"response": s.get("response", ""), "phase": "intake"},
+        lambda s: {
+            "response": s.get("response", ""),
+            "phase": "intake",
+            "intake_field": s.get("intake_field"),
+            "location_prompt": s.get("location_prompt"),
+        },
     )
 
     graph_builder.add_edge(START, "intake")

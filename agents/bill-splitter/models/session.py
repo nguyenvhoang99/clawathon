@@ -17,6 +17,8 @@ class SessionStatus(str, Enum):
 class BillSession(BaseModel):
     team_id: str
     session_id: str
+    trip_id: str | None = None
+    contribution_vnd_per_member: int | None = None
     members: dict[str, MemberProfile] = Field(default_factory=dict)
     expenses: list[Expense] = Field(default_factory=list)
     status: SessionStatus = SessionStatus.COLLECTING

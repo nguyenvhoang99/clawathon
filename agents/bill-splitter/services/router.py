@@ -52,7 +52,7 @@ class ActionRouter:
                 "status": "success",
                 "phase": "help",
                 "response": (
-                    "Specify an action: register_member, set_bank, upload_receipt, "
+                    "Specify an action: register_member, set_bank, link_trip, upload_receipt, "
                     "add_expense, confirm_expense, assign_split, list_expenses, "
                     "list_members, list_balances, confirm_bills, finalize, get_settlement"
                 ),
@@ -77,6 +77,17 @@ class ActionRouter:
         session: BillSession,
         user_id: str,
     ) -> dict[str, Any]:
+        if action == "link_trip":
+            session.trip_id = payload.get("trip_id")
+            if payload.get("contribution_vnd_per_member") is not None:
+                session.contribution_vnd_per_member = int(payload["contribution_vnd_per_member"])
+            return {
+                "phase": session.status.value,
+                "response": f"Linked to trip {session.trip_id}.",
+                "trip_id": session.trip_id,
+                "contribution_vnd_per_member": session.contribution_vnd_per_member,
+            }
+
         if action == "register_member":
             member_id = payload.get("member_id") or user_id
             member = MemberProfile(

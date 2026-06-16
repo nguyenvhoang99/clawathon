@@ -128,10 +128,16 @@ def handler(payload: dict, context: RequestContext) -> dict:
     }
     if result.get("trip_brief"):
         response_body["trip_brief"] = result["trip_brief"]
+    if result.get("intake_field"):
+        response_body["intake_field"] = result["intake_field"]
+    if result.get("location_prompt") is not None:
+        response_body["location_prompt"] = bool(result["location_prompt"])
     if result.get("budget_ledger"):
         response_body["budget_ledger"] = result["budget_ledger"]
     if result.get("itinerary"):
         response_body["itinerary"] = result["itinerary"]
+    if result.get("plan"):
+        response_body["plan"] = result["plan"]
     if result.get("data_sources"):
         response_body["data_sources"] = result["data_sources"]
     if result.get("stay_results") and result.get("phase") == "done":
